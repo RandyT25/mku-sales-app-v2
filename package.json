@@ -1,0 +1,6 @@
+{
+  "name": "mku-sales-app-v2",
+  "private": true,
+  "type": "module",
+  "description": "No build step for the deployed app — this file exists only so Node-based local tooling (scripts/seed-reps.mjs) can import shared ESM modules under lib/."
+}

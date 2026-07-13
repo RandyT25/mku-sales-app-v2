@@ -1,0 +1,19 @@
+// Copy this file to scripts/seed-reps.local.mjs (gitignored) and fill in
+// each rep's real initial 6-digit PIN before running scripts/seed-reps.mjs.
+// Never commit the filled-in version.
+export const PINS = {
+  'Picrom':         '000000',
+  'I Made Luih':    '000000',
+  'Juni':           '000000',
+  'Lani':           '000000',
+  'Monica':         '000000',
+  'Sujana':         '000000',
+  'Eka':            '000000',
+  'Taufik':         '000000',
+  'Dewi Kristiani': '000000',
+  'Wira':           '000000',
+  'Sriasih':        '000000',
+  'Ridwan':         '000000',
+  'Redi':           '000000',
+  'Gek Mas':        '000000',
+};
