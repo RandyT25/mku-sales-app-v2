@@ -37,10 +37,17 @@ The plan proposed splitting `sales.js`'s logic into one file per feature under `
 
 **The plan going forward:** split `app-core.js` into `features/*.js` incrementally, **one module at a time, only when that feature is actually being touched** for a new Supabase-backed capability (e.g., when building the order-builder upgrade in Phase 5, extract just the order-builder logic into `features/order-builder.js` at that point, verify it still works, then move on). This spreads the refactor risk across many small, individually-verifiable steps instead of one large one, and means nothing gets refactored before there's a real reason to touch it.
 
-## Next steps (not yet done)
-1. Push this repo to GitHub (`RandyT25/mku-sales-app-v2`), enable Pages, confirm live deploy loads on Randy's phone.
-2. Verify parity: log in as a real rep, confirm Target screen (hero %, NN exclusion, pace color, area leaderboard), Pricelist, Stock, and Toolkit all match v1's output exactly for the same rep/day.
-3. Phase 1 (Supabase project + PIN auth) — see the approved plan for schema and RLS design.
+## Phase 0: DONE — live and verified
+
+- Repo created: `RandyT25/mku-sales-app-v2` (public, matches v1).
+- GitHub Pages live at **`https://randyt25.github.io/mku-sales-app-v2/`**.
+- Verified in-browser against the live URL (not just local): Target screen (hero %, milestone bars, pace color/tag), Pricelist (348 MKU / 223 MKS products, categories, prices), Stock (live counts: In Stock/Low/Critical/Out), and Toolkit (catalogs, correct page counts) all render correctly with real data from the same Dashboard feed v1 uses.
+
+**Known quirk (not a bug):** v1 and v2 are both hosted on the `randyt25.github.io` origin (different paths). `localStorage` is scoped per-origin, not per-path, so the two tiny v1 localStorage keys (`mku_saved_rep`, `mku_ann_read`) are **shared** between v1 and v2 in the same browser — logging into a rep on one will auto-select that same rep index on the other. Harmless today since both use the identical `REP_CONFIG` order, but worth remembering if `REP_CONFIG` ever diverges between the two apps, or if this cross-app bleed ever becomes confusing in practice (fix would be a v2-specific key name, e.g. `mkuv2_saved_rep`).
+
+## Next steps
+1. Phase 1 (Supabase project + PIN auth) — see the approved plan for schema and RLS design.
+2. First real feature: competitor price log (Phase 2 in the plan) — simplest net-new write path, proves out RLS before anything else depends on it.
 
 ## Rules carried over from v1 (still apply)
 - Overall % excludes Naughty Nuris (NN) from the denominator — NN shown as a separate mini metric only.
