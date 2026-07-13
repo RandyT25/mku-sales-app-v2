@@ -1,0 +1,16 @@
+{
+  "name": "MKU & MKS Sales App V2",
+  "short_name": "MKU·MKS V2",
+  "description": "Sales Team Portal V2 — PT. Mandala Kriya Utama & PT. Mandala Kriya Semesta",
+  "start_url": "/mku-sales-app-v2/",
+  "scope": "/mku-sales-app-v2/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A0A0F",
+  "theme_color": "#C8242A",
+  "icons": [
+    { "src": "icons/icon-96.png",  "sizes": "96x96",   "type": "image/png" },
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

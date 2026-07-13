@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MKU · MKS Sales V2</title>
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/app.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MKU·MKS">
+  <meta name="theme-color" content="#C8242A">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+<body>
+
+<!-- LOGIN — starts as loading screen, replaced by real login after data loads -->
+<div id="login-screen" class="login-screen">
+  <div class="login-bg"></div>
+  <div id="login-inner" style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px;padding:24px">
+    <img src="logo-mku-mks.png" style="width:200px;max-width:80%;object-fit:contain;margin-bottom:8px;mix-blend-mode:screen;filter:drop-shadow(0 0 20px rgba(200,36,42,0.3))" onerror="this.style.display='none'">
+    <div id="load-msg" style="color:rgba(255,255,255,0.5);font-size:.75rem;letter-spacing:1px;text-transform:uppercase">Loading…</div>
+    <div class="load-spinner"></div>
+    <div class="load-bar-wrap"><div class="load-bar" id="load-bar"></div></div>
+  </div>
+</div>
+
+<!-- MAIN APP — hidden until rep logs in -->
+<div id="main-app" class="main-app hidden">
+
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="back-btn" onclick="logout()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="topbar-identity">
+        <div class="topbar-name" id="topbar-name">—</div>
+        <div class="topbar-area" id="topbar-area">—</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-date" id="topbar-date">—</div>
+      <button class="bell-btn" id="bell-btn" onclick="toggleAnnouncements()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <div class="bell-badge hidden" id="bell-badge">0</div>
+      </button>
+    </div>
+  </header>
+
+  <div class="screens" id="screens">
+
+    <div class="screen active" id="screen-target">
+      <div class="target-hero" id="target-hero"></div>
+      <div class="target-body" id="target-body"></div>
+    </div>
+
+    <div class="screen" id="screen-price">
+      <div class="pl-header" id="pl-header">
+        <div class="pl-search-wrap">
+          <svg class="pl-search-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="pl-search" id="pl-search" type="search" placeholder="Search product or brand…" oninput="onSearch(this.value)" autocomplete="off">
+        </div>
+        <div class="pl-divtabs" id="pl-divtabs">
+          <button class="pl-divtab active" onclick="switchDiv('MKU', this)">MKU <span id="mku-count"></span></button>
+          <button class="pl-divtab" onclick="switchDiv('MKS', this)">MKS <span id="mks-count"></span></button>
+        </div>
+        <div class="pl-cats" id="pl-cats"></div>
+      </div>
+      <div class="pl-list" id="pl-list"></div>
+    </div>
+
+    <div class="screen" id="screen-order">
+      <div class="order-meta-bar">
+        <input class="order-cust-inp" id="order-cust" placeholder="Customer / outlet name…" autocomplete="off">
+        <input class="order-cust-inp" id="order-notes" placeholder="Notes (optional)" autocomplete="off">
+      </div>
+      <div id="order-body"></div>
+    </div>
+
+    <div class="screen" id="screen-stock">
+      <div class="stock-search-bar">
+        <div class="pl-search-wrap" style="margin-bottom:0">
+          <svg class="pl-search-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="pl-search" id="stock-search-inp" type="search" placeholder="Search product name…" oninput="onStockSearch(this.value)" autocomplete="off">
+        </div>
+      </div>
+      <div class="stock-filters">
+        <button class="sf active" onclick="filterStock('all',this)">All</button>
+        <button class="sf ok" onclick="filterStock('ok',this)">✅ In Stock</button>
+        <button class="sf low" onclick="filterStock('low',this)">⚠️ Low</button>
+        <button class="sf critical" onclick="filterStock('critical',this)">🔴 Critical</button>
+        <button class="sf out" onclick="filterStock('out',this)">❌ Out</button>
+      </div>
+      <div class="stock-divtabs">
+        <button class="sdiv active" onclick="switchStockDiv('MKU',this)">MKU</button>
+        <button class="sdiv" onclick="switchStockDiv('MKS',this)">MKS</button>
+      </div>
+      <div id="stock-list"></div>
+    </div>
+
+    <div class="screen" id="screen-catalog">
+      <div class="toolkit-wrap">
+
+        <div class="toolkit-tabs">
+          <button class="tk-tab active" id="tktab-catalogs"  onclick="switchToolkit('catalogs',this)">📚 Catalogs</button>
+          <button class="tk-tab"        id="tktab-spotlight" onclick="switchToolkit('spotlight',this)">🌟 Spotlight</button>
+          <button class="tk-tab"        id="tktab-faq"       onclick="switchToolkit('faq',this)">❓ FAQ</button>
+          <button class="tk-tab"        id="tktab-battle"    onclick="switchToolkit('battle',this)">⚔️ Battle</button>
+          <button class="tk-tab"        id="tktab-modules"   onclick="switchToolkit('modules',this)">📖 Modules</button>
+        </div>
+        <div class="tk-lang-bar" id="tk-lang-bar" style="display:none">
+          <div class="tk-lang-toggle" onclick="toggleTkLang()">
+            <span class="tk-lang-opt active" id="tk-lang-en">EN</span>
+            <div class="tk-lang-track" id="tk-lang-track">
+              <div class="tk-lang-knob" id="tk-lang-knob">🇬🇧</div>
+            </div>
+            <span class="tk-lang-opt" id="tk-lang-id">ID</span>
+          </div>
+        </div>
+
+        <div class="toolkit-section active" id="tksec-catalogs">
+          <div class="catalog-card mku-card">
+            <a class="catalog-card-body" href="MKU Catalog 2026.pdf" target="_blank">
+              <div class="catalog-card-logo">
+                <svg viewBox="0 0 200 72" class="catalog-logo-svg"><defs><linearGradient id="cMKU" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#D4262B"/><stop offset="100%" style="stop-color:#8B0000"/></linearGradient></defs><text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#cMKU)" letter-spacing="-3">mku</text></svg>
+              </div>
+              <div class="catalog-card-info">
+                <div class="catalog-card-name">MKU Catalog 2026</div>
+                <div class="catalog-card-sub">PT. Mandala Kriya Utama · 64 pages</div>
+              </div>
+            </a>
+            <button class="catalog-share-btn mku-share" onclick="shareCatalog('MKU Catalog 2026.pdf','MKU Catalog 2026',event)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              Share
+            </button>
+          </div>
+          <div class="catalog-card mks-card">
+            <a class="catalog-card-body" href="MKS Catalog 2026.pdf" target="_blank">
+              <div class="catalog-card-logo">
+                <svg viewBox="0 0 200 72" class="catalog-logo-svg"><defs><linearGradient id="cMKS" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#6EC6F5"/><stop offset="100%" style="stop-color:#1A6FC8"/></linearGradient></defs><text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#cMKS)" letter-spacing="-3">mks</text></svg>
+              </div>
+              <div class="catalog-card-info">
+                <div class="catalog-card-name">MKS Catalog 2026</div>
+                <div class="catalog-card-sub">PT. Mandala Kriya Semesta · 45 pages</div>
+              </div>
+            </a>
+            <button class="catalog-share-btn mks-share" onclick="shareCatalog('MKS Catalog 2026.pdf','MKS Catalog 2026',event)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              Share
+            </button>
+          </div>
+        </div>
+
+        <div class="toolkit-section hidden" id="tksec-spotlight">
+          <div id="spotlight-list"></div>
+        </div>
+
+        <div class="toolkit-section hidden" id="tksec-faq">
+          <div class="tk-search-wrap">
+            <svg class="pl-search-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input class="pl-search" id="faq-search" type="search" placeholder="Search FAQ…" oninput="renderFAQ(this.value)" autocomplete="off">
+          </div>
+          <div id="faq-list"></div>
+        </div>
+
+        <div class="toolkit-section hidden" id="tksec-battle">
+          <div id="battle-list"></div>
+        </div>
+
+        <div class="toolkit-section hidden" id="tksec-modules">
+          <div id="modules-list"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CUSTOMERS SCREEN -->
+    <div class="screen" id="screen-customers">
+      <div class="cust-header">
+        <div class="cust-search-wrap">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;color:var(--txt3)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="pl-search" id="cust-search-inp" type="search" placeholder="Search customer…" oninput="onCustSearch(this.value)" autocomplete="off">
+        </div>
+        <div class="cust-filters">
+          <button class="cf active" onclick="filterCustGroup('all',this)">All</button>
+          <button class="cf" onclick="filterCustGroup('RESTAURANT',this)">Restaurant</button>
+          <button class="cf" onclick="filterCustGroup('HOTEL',this)">Hotel</button>
+          <button class="cf" onclick="filterCustGroup('BEACH CLUB',this)">Beach Club</button>
+          <button class="cf" onclick="filterCustGroup('WHOLE SALES',this)">Wholesale</button>
+          <button class="cf" onclick="filterCustGroup('CATERING',this)">Catering</button>
+          <button class="cf" onclick="filterCustGroup('BAR',this)">Bar</button>
+          <button class="cf" onclick="filterCustGroup('OTHERS',this)">Others</button>
+          <button class="cf" onclick="filterCustGroup('INACTIVE',this)">Inactive</button>
+        </div>
+        <div class="cust-sort-bar">
+          <span class="cust-count" id="cust-count"></span>
+          <select class="cust-sort-sel" id="cust-sort" onchange="renderCustomers()">
+            <option value="revenue">Top Spend</option>
+            <option value="recent">Most Recent</option>
+            <option value="name">A–Z</option>
+            <option value="inactive">Least Active</option>
+          </select>
+        </div>
+      </div>
+      <div id="cust-list"></div>
+    </div>
+
+  </div>
+
+<!-- CUSTOMER DETAIL MODAL -->
+<div class="overlay hidden" id="cust-overlay" onclick="closeCustModal(event)">
+  <div class="cust-modal" id="cust-modal">
+    <div class="pm-handle"></div>
+    <div class="cm-header">
+      <div class="cm-name" id="cm-name"></div>
+      <div class="cm-meta" id="cm-meta"></div>
+    </div>
+    <div class="cm-spark-row" id="cm-spark-row"></div>
+    <div class="cm-stats" id="cm-stats"></div>
+    <div class="cm-section-title">Monthly Revenue</div>
+    <div class="cm-monthly-rev" id="cm-monthly-rev"></div>
+    <div class="cm-section-title">Top 5 Products (YTD)</div>
+    <div class="cm-top5" id="cm-top5"></div>
+    <div class="cm-section-title">Order History</div>
+    <div class="cm-month-tabs" id="cm-month-tabs"></div>
+    <div class="cm-products" id="cm-products"></div>
+    <div class="cm-footer">
+      <button class="cm-wa-btn" onclick="shareCustomerWA()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Share Visit Summary
+      </button>
+    </div>
+  </div>
+</div>
+
+  <nav class="bottom-nav">
+    <button class="bnav active" id="bnav-target" onclick="switchTab('target')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      <span>Target</span>
+    </button>
+    <button class="bnav" id="bnav-price" onclick="switchTab('price')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Pricelist</span>
+    </button>
+    <button class="bnav order-bnav" id="bnav-order" onclick="switchTab('order')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <span>Order</span>
+      <div class="order-badge" id="order-badge" style="display:none">0</div>
+    </button>
+    <button class="bnav" id="bnav-stock" onclick="switchTab('stock')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span>Stock</span>
+    </button>
+    <button class="bnav" id="bnav-catalog" onclick="switchTab('catalog')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <span>Toolkit</span>
+    </button>
+    <button class="bnav" id="bnav-customers" onclick="switchTab('customers')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Customers</span>
+    </button>
+  </nav>
+
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="overlay hidden" id="prod-overlay" onclick="closeProdModal(event)">
+  <div class="prod-modal" id="prod-modal">
+    <div class="pm-handle"></div>
+    <div class="pm-badge" id="pm-badge"></div>
+    <div class="pm-name" id="pm-name"></div>
+    <div class="pm-details" id="pm-details"></div>
+    <div class="pm-actions">
+      <button class="pm-btn-wa" onclick="shareProductWA()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Share
+      </button>
+      <button class="pm-btn-add" onclick="addToOrder()">+ Add to Order</button>
+      <button class="pm-btn-close" onclick="closeProdModalBtn()">✕</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="data/products.js"></script>
+<script src="data/stock_map.js"></script>
+<script src="data/announcements.js"></script>
+<script src="data/toolkit.js"></script>
+<script>
+// ── STEP 1: Animate the loading bar ──
+let _barTimer = (function() {
+  let p = 0;
+  return setInterval(() => {
+    p = Math.min(p + Math.random() * 6, 85);
+    const b = document.getElementById('load-bar');
+    if (b) b.style.width = p + '%';
+  }, 400);
+})();
+
+// ── STEP 2: Load data, then load app ──
+function _loadScript(url, ok, fail) {
+  const s = document.createElement('script');
+  s.src = url;
+  s.onload = ok;
+  s.onerror = fail;
+  document.head.appendChild(s);
+}
+
+function _showLogin() {
+  // Replace loading screen with real login UI
+  document.getElementById('login-screen').innerHTML = `
+    <div class="login-bg"></div>
+    <div class="login-card">
+      <div class="login-logos">
+        <img src="logo-mku-mks.png" class="login-combined-logo" alt="MKU MKS" onerror="this.style.display='none'">
+      </div>
+      <div class="login-portal-label">Sales Team Portal · V2</div>
+      <div class="login-select-wrap">
+        <div class="login-select-label">Select your name</div>
+        <div class="login-dropdown-wrap">
+          <select class="login-dropdown" id="rep-select" onchange="onRepSelect(this)">
+            <option value="" disabled selected>— Choose —</option>
+          </select>
+          <svg class="login-dropdown-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <button class="login-enter-btn" id="login-enter-btn" onclick="doLogin()" disabled>
+          Continue
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>`;
+  // Now populate the dropdown
+  buildLogin();
+}
+
+function _dataLoaded() {
+  console.log('RAW.latest=', RAW.latest, 'Juni pct=', (RAW.targets_by_date[RAW.latest]?.area_targets||[]).find(a=>a.sales==='Juni')?.pct);
+  clearInterval(_barTimer);
+  const b = document.getElementById('load-bar');
+  if (b) b.style.width = '100%';
+  // Load the app JS, then show login
+  _loadScript('lib/app-core.js?v=' + new Date().toISOString().slice(0,13), _showLogin, function() {
+    document.getElementById('load-msg').textContent = 'App failed to load — try refreshing';
+    document.getElementById('load-msg').style.color = '#F08080';
+  });
+}
+
+function _dataFailed() {
+  const el = document.getElementById('load-msg');
+  if (el) { el.textContent = 'Loading full data…'; }
+  _loadScript(
+    'https://randyt25.github.io/MKU-MKS-Area-Dashboard/data.js',
+    _dataLoaded,
+    function() {
+      clearInterval(_barTimer);
+      const el = document.getElementById('load-msg');
+      if (el) { el.textContent = 'Failed to load — check connection'; el.style.color = '#F08080'; }
+    }
+  );
+}
+
+// Always fetch from dashboard repo
+_loadScript(
+  'https://randyt25.github.io/MKU-MKS-Area-Dashboard/data_sales.js?v=' + new Date().toISOString().slice(0,10),
+  function() {
+    _dataLoaded();
+    _loadScript(
+      'https://randyt25.github.io/MKU-MKS-Area-Dashboard/customers.js?v=' + new Date().toISOString().slice(0,10),
+      function() { window._customersReady = true; if (window._custTabOpen) renderCustomers(); if (typeof window.refreshCustIfOpen === 'function') window.refreshCustIfOpen(); },
+      function() { window._customersReady = false; }
+    );
+    // Load FJ delivery Excel files via SheetJS
+    // Use GitHub API (not raw CDN) — CDN ignores cache-busting query params.
+    const _fjApiBase = 'https://api.github.com/repos/RandyT25/MKU-MKS-Area-Dashboard/contents/uploads/';
+    const _fjTodayDay = (new Date()).getDate();
+    async function _loadFJExcel(filename, varName) {
+      try {
+        const resp = await fetch(_fjApiBase + filename, {
+          cache: 'no-store',
+          headers: { 'Accept': 'application/vnd.github.raw' }
+        });
+        if (!resp.ok) throw new Error(resp.status);
+        const buf = await resp.arrayBuffer();
+        const wb = XLSX.read(new Uint8Array(buf), { type: 'array', cellDates: true });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        window[varName] = XLSX.utils.sheet_to_json(ws, { defval: '' });
+        window._fjNameMap = null;
+      } catch(e) { console.warn('FJ load failed:', varName, e.message); window[varName] = []; }
+    }
+    // Mirrors date-parsing + isFJStale logic in lib/app-core.js (getFJData/isFJStale).
+    // Duplicated (not shared) because app-core.js loads async in parallel with this
+    // code and may not be ready yet — keep in sync if that logic ever changes.
+    function _fjMaxDate(rows) {
+      let max = new Date(0);
+      for (const r of rows) {
+        const raw = r['Tgl. Kirim'];
+        const d = raw instanceof Date ? raw
+          : (typeof raw === 'number' ? new Date((raw - 25569) * 86400 * 1000)
+          : (typeof raw === 'string' && raw ? new Date(raw) : null));
+        if (d && !isNaN(d) && d > max) max = d;
+      }
+      return max;
+    }
+    function _fjIsStale(rows) {
+      if (!rows.length) return true;
+      const today = new Date(); today.setHours(0,0,0,0);
+      return _fjMaxDate(rows) < today;
+    }
+    // Try days +1, +2, +3, +4 — handles weekends/holidays where the next file
+    // might skip a day (e.g. no Sunday deliveries, so Monday file is uploaded instead).
+    // A candidate file is only accepted if its embedded dates are actually fresh —
+    // filenames recycle monthly (no month/year in the name), so a same-named file
+    // can still hold last month's stale data until the warehouse re-uploads it.
+    // Falls back to today's file if none of +1..+4 are fresh.
+    async function _loadFJDiv(prefix, varName) {
+      for (let i = 1; i <= 4; i++) {
+        const d = new Date(); d.setDate(d.getDate() + i);
+        await _loadFJExcel(prefix + '%20' + d.getDate() + '.xlsx', varName);
+        if ((window[varName] || []).length && !_fjIsStale(window[varName])) return;
+      }
+      await _loadFJExcel(prefix + '%20' + _fjTodayDay + '.xlsx', varName);
+    }
+    _loadScript('https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js',
+      function() {
+        Promise.all([
+          _loadFJDiv('MKU', 'FJ_MKU'),
+          _loadFJDiv('MKS', 'FJ_MKS'),
+          _loadFJExcel('MKU%20' + _fjTodayDay + '.xlsx', 'FJ_MKU_TODAY'),
+          _loadFJExcel('MKS%20' + _fjTodayDay + '.xlsx', 'FJ_MKS_TODAY')
+        ]).then(function() {
+          if (window._currentRep && typeof renderTarget === 'function') {
+            renderTarget();
+          }
+        });
+      },
+      function() { window.FJ_MKU = []; window.FJ_MKS = []; window.FJ_MKU_TODAY = []; window.FJ_MKS_TODAY = []; }
+    );
+  },
+  _dataFailed
+);
+</script>
+
+<!-- ANNOUNCEMENT PANEL -->
+<div class="ann-overlay hidden" id="ann-overlay" onclick="closeAnnouncements(event)">
+  <div class="ann-panel" id="ann-panel">
+    <div class="ann-panel-header">
+      <div class="ann-panel-title">Announcements</div>
+      <button class="ann-close" onclick="closeAnnouncements()">✕</button>
+    </div>
+    <div class="ann-list" id="ann-list"></div>
+  </div>
+</div>
+
+<!-- INSTALL BANNER -->
+<div class="install-banner hidden" id="install-banner">
+  <img src="logo-mku-mks.png" class="install-logo" alt="MKU MKS">
+  <div class="install-text">
+    <div class="install-title">Install Sales App</div>
+    <div class="install-sub">Add to your home screen for quick access</div>
+  </div>
+  <button class="install-btn" id="install-btn">Install</button>
+  <button class="install-dismiss" id="install-dismiss">✕</button>
+</div>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(e => console.log('SW:', e));
+  });
+}
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  setTimeout(() => {
+    const b = document.getElementById('install-banner');
+    if (b) b.classList.remove('hidden');
+  }, 4000);
+});
+document.getElementById('install-btn')?.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('install-banner').classList.add('hidden');
+});
+document.getElementById('install-dismiss')?.addEventListener('click', () => {
+  document.getElementById('install-banner').classList.add('hidden');
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('install-banner')?.classList.add('hidden');
+});
+let _hiddenAt = null;
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    _hiddenAt = Date.now();
+  } else if (_hiddenAt && Date.now() - _hiddenAt > 10 * 60 * 1000) {
+    location.reload();
+  }
+});
+</script>
+</body>
+</html>
