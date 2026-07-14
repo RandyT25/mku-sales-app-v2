@@ -943,15 +943,19 @@ input { font-family: var(--sans); }
   position: sticky; top: 0; z-index: 20;
 }
 .toolkit-tabs-wrap::after {
-  content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 28px;
+  content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 34px;
   background: linear-gradient(to right, transparent, var(--surface));
   pointer-events: none;
+}
+.toolkit-tabs-hint {
+  position: absolute; top: 0; bottom: 0; right: 2px; z-index: 1;
+  display: flex; align-items: center; color: var(--txt3); pointer-events: none;
 }
 .toolkit-tabs {
   display: flex; gap: 0; background: var(--surface);
   border-bottom: 1px solid var(--border);
   overflow-x: auto; scrollbar-width: none;
-  padding-right: 28px;
+  padding-right: 14px;
 }
 .toolkit-tabs::-webkit-scrollbar { display: none; }
 .tk-tab {
