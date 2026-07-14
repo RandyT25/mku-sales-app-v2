@@ -1,5 +1,6 @@
 // One-time seed script: creates a Supabase Auth user (email=login_alias,
-// password=PIN) + a `reps` row for each of the 14 reps.
+// password=PIN) + a `reps` row for each of the 14 field reps plus the
+// dedicated "Manager" login (is_manager: true, Phase 7).
 //
 // Run locally, never in CI:
 //   SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... node scripts/seed-reps.mjs
@@ -40,6 +41,7 @@ const REPS = [
   { name: 'Ridwan',         area: 'NP-1 (Nestlé)' },
   { name: 'Redi',           area: 'NP-2 (Nestlé)' },
   { name: 'Gek Mas',        area: 'NP-3 (Nestlé)' },
+  { name: 'Manager',        area: 'Management', is_manager: true },
 ];
 
 const headers = {
@@ -74,7 +76,7 @@ async function createAuthUser(email, password, displayName) {
   return data.id ?? data.user?.id;
 }
 
-async function createRepRow({ name, login_alias, auth_user_id, is_nestle }) {
+async function createRepRow({ name, login_alias, auth_user_id, is_nestle, is_manager }) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/reps`, {
     method: 'POST',
     headers: { ...headers, Prefer: 'return=minimal' },
@@ -83,7 +85,7 @@ async function createRepRow({ name, login_alias, auth_user_id, is_nestle }) {
       login_alias,
       auth_user_id,
       is_nestle,
-      is_manager: false, // no manager data source yet — flip manually in Supabase Studio after seeding
+      is_manager: !!is_manager,
       active: true,
     }),
   });
@@ -108,6 +110,7 @@ for (const rep of REPS) {
       login_alias: alias,
       auth_user_id: authUserId,
       is_nestle: rep.area.includes('Nestlé'),
+      is_manager: rep.is_manager,
     });
     console.log(`✓ ${rep.name} (${alias})`);
   } catch (e) {

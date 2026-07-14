@@ -16,4 +16,5 @@ export const PINS = {
   'Ridwan':         '000000',
   'Redi':           '000000',
   'Gek Mas':        '000000',
+  'Manager':        '000000',
 };

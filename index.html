@@ -13,9 +13,13 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="MKU·MKS">
-  <meta name="theme-color" content="#C8242A">
+  <meta name="theme-color" content="#AD1F28">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <script type="module" src="lib/auth.js"></script>
+  <script type="module" src="features/competitor-intel.js"></script>
+  <script type="module" src="features/customer-identity.js"></script>
+  <script type="module" src="features/customer-relations.js"></script>
+  <script type="module" src="features/today-priorities.js"></script>
 </head>
 <body>
 
@@ -38,6 +42,7 @@
       <button class="back-btn" onclick="logout()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
+      <div class="topbar-avatar" id="topbar-avatar">—</div>
       <div class="topbar-identity">
         <div class="topbar-name" id="topbar-name">—</div>
         <div class="topbar-area" id="topbar-area">—</div>
@@ -54,7 +59,15 @@
 
   <div class="screens" id="screens">
 
-    <div class="screen active" id="screen-target">
+    <div class="screen active" id="screen-today">
+      <div class="today-header">
+        <div class="today-title">Today's Priorities</div>
+        <div class="today-sub" id="today-date"></div>
+      </div>
+      <div id="today-body"></div>
+    </div>
+
+    <div class="screen" id="screen-target">
       <div class="target-hero" id="target-hero"></div>
       <div class="target-body" id="target-body"></div>
     </div>
@@ -76,9 +89,17 @@
 
     <div class="screen" id="screen-order">
       <div class="order-meta-bar">
-        <input class="order-cust-inp" id="order-cust" placeholder="Customer / outlet name…" autocomplete="off">
+        <div class="order-cust-row">
+          <input class="order-cust-inp" id="order-cust" list="order-cust-datalist" placeholder="Customer / outlet name…" autocomplete="off" oninput="onOrderCustInput(this.value)">
+          <datalist id="order-cust-datalist"></datalist>
+          <button class="order-drafts-btn" onclick="openDraftsList()" title="Saved drafts">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h6l2 2h8v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>
+            <span id="order-drafts-count" class="order-drafts-count hidden">0</span>
+          </button>
+        </div>
         <input class="order-cust-inp" id="order-notes" placeholder="Notes (optional)" autocomplete="off">
       </div>
+      <div id="order-suggestions" class="order-suggestions hidden"></div>
       <div id="order-body"></div>
     </div>
 
@@ -91,10 +112,10 @@
       </div>
       <div class="stock-filters">
         <button class="sf active" onclick="filterStock('all',this)">All</button>
-        <button class="sf ok" onclick="filterStock('ok',this)">✅ In Stock</button>
-        <button class="sf low" onclick="filterStock('low',this)">⚠️ Low</button>
-        <button class="sf critical" onclick="filterStock('critical',this)">🔴 Critical</button>
-        <button class="sf out" onclick="filterStock('out',this)">❌ Out</button>
+        <button class="sf ok" onclick="filterStock('ok',this)"><span class="sf-dot ok"></span>In Stock</button>
+        <button class="sf low" onclick="filterStock('low',this)"><span class="sf-dot low"></span>Low</button>
+        <button class="sf critical" onclick="filterStock('critical',this)"><span class="sf-dot critical"></span>Critical</button>
+        <button class="sf out" onclick="filterStock('out',this)"><span class="sf-dot out"></span>Out</button>
       </div>
       <div class="stock-divtabs">
         <button class="sdiv active" onclick="switchStockDiv('MKU',this)">MKU</button>
@@ -107,17 +128,17 @@
       <div class="toolkit-wrap">
 
         <div class="toolkit-tabs">
-          <button class="tk-tab active" id="tktab-catalogs"  onclick="switchToolkit('catalogs',this)">📚 Catalogs</button>
-          <button class="tk-tab"        id="tktab-spotlight" onclick="switchToolkit('spotlight',this)">🌟 Spotlight</button>
-          <button class="tk-tab"        id="tktab-faq"       onclick="switchToolkit('faq',this)">❓ FAQ</button>
-          <button class="tk-tab"        id="tktab-battle"    onclick="switchToolkit('battle',this)">⚔️ Battle</button>
-          <button class="tk-tab"        id="tktab-modules"   onclick="switchToolkit('modules',this)">📖 Modules</button>
+          <button class="tk-tab active" id="tktab-catalogs"  onclick="switchToolkit('catalogs',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Catalogs</button>
+          <button class="tk-tab"        id="tktab-spotlight" onclick="switchToolkit('spotlight',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Spotlight</button>
+          <button class="tk-tab"        id="tktab-faq"       onclick="switchToolkit('faq',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>FAQ</button>
+          <button class="tk-tab"        id="tktab-battle"    onclick="switchToolkit('battle',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l12 12M18 4L6 16"/><path d="M4 20l3-3M17 17l3 3"/></svg>Battle</button>
+          <button class="tk-tab"        id="tktab-modules"   onclick="switchToolkit('modules',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>Modules</button>
         </div>
         <div class="tk-lang-bar" id="tk-lang-bar" style="display:none">
           <div class="tk-lang-toggle" onclick="toggleTkLang()">
             <span class="tk-lang-opt active" id="tk-lang-en">EN</span>
             <div class="tk-lang-track" id="tk-lang-track">
-              <div class="tk-lang-knob" id="tk-lang-knob">🇬🇧</div>
+              <div class="tk-lang-knob" id="tk-lang-knob"></div>
             </div>
             <span class="tk-lang-opt" id="tk-lang-id">ID</span>
           </div>
@@ -210,7 +231,129 @@
       <div id="cust-list"></div>
     </div>
 
+    <!-- COMPETITOR INTEL SCREEN -->
+    <div class="screen" id="screen-intel">
+      <div class="intel-header">
+        <div class="pl-search-wrap">
+          <svg class="pl-search-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="pl-search" id="intel-search-inp" type="search" placeholder="Search competitor or product…" oninput="onIntelSearch(this.value)" autocomplete="off">
+        </div>
+      </div>
+      <div id="intel-list"></div>
+      <button class="intel-fab" onclick="openIntelForm()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Log Price
+      </button>
+    </div>
+
   </div>
+
+<!-- COMPETITOR INTEL FORM -->
+<div class="overlay hidden" id="intel-form-overlay" onclick="closeIntelForm(event)">
+  <div class="prod-modal" id="intel-form-modal">
+    <div class="pm-handle"></div>
+    <div class="pm-name">Log Competitor Price</div>
+    <div class="pm-details" style="grid-template-columns:1fr">
+      <div class="pm-det full">
+        <div class="pm-det-label">Competitor Name *</div>
+        <input class="order-cust-inp" id="intel-competitor" placeholder="e.g. PT Sinar Jaya" autocomplete="off">
+      </div>
+      <div class="pm-det full">
+        <div class="pm-det-label">Product *</div>
+        <input class="order-cust-inp" id="intel-product" placeholder="e.g. French Fries 2.5kg" autocomplete="off">
+      </div>
+      <div class="pm-det full">
+        <div class="pm-det-label">Category</div>
+        <input class="order-cust-inp" id="intel-category" placeholder="Optional" autocomplete="off">
+      </div>
+      <div class="pm-det full">
+        <div class="pm-det-label">Price *</div>
+        <input class="order-cust-inp" id="intel-price" type="number" inputmode="decimal" placeholder="e.g. 49000" autocomplete="off">
+      </div>
+      <div class="pm-det full">
+        <div class="pm-det-label">Unit *</div>
+        <input class="order-cust-inp" id="intel-unit" placeholder="e.g. per Kg, per Box" autocomplete="off">
+      </div>
+      <div class="pm-det full">
+        <div class="pm-det-label">Customer / Outlet</div>
+        <input class="order-cust-inp" id="intel-customer" placeholder="Optional" autocomplete="off">
+      </div>
+      <div class="pm-det full">
+        <div class="pm-det-label">Notes</div>
+        <input class="order-cust-inp" id="intel-notes" placeholder="Optional" autocomplete="off">
+      </div>
+    </div>
+    <div class="intel-form-error" id="intel-form-error">&nbsp;</div>
+    <div class="pm-actions">
+      <button class="pm-btn-close" onclick="closeIntelForm()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <button class="pm-btn-add" style="flex:1" onclick="submitIntelForm()">Save Log Entry</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT FORM -->
+<div class="overlay hidden" id="contact-form-overlay" onclick="closeContactForm(event)">
+  <div class="prod-modal" id="contact-form-modal">
+    <div class="pm-handle"></div>
+    <div class="pm-name" id="contact-form-title">Add Contact</div>
+    <div class="pm-details" style="grid-template-columns:1fr">
+      <div class="pm-det full">
+        <div class="pm-det-label">Name *</div>
+        <input class="order-cust-inp" id="contact-name" placeholder="e.g. Budi Santoso" autocomplete="off">
+      </div>
+      <div class="pm-det full">
+        <div class="pm-det-label">Role</div>
+        <input class="order-cust-inp" id="contact-role" placeholder="e.g. Purchasing Manager" autocomplete="off">
+      </div>
+      <div class="pm-det full">
+        <div class="pm-det-label">Phone / WhatsApp</div>
+        <input class="order-cust-inp" id="contact-phone" placeholder="e.g. 08123456789" autocomplete="off">
+      </div>
+    </div>
+    <div class="intel-form-error" id="contact-form-error">&nbsp;</div>
+    <div class="pm-actions">
+      <button class="pm-btn-close" onclick="closeContactForm()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <button class="pm-btn-add" style="flex:1" onclick="submitContactForm()">Save Contact</button>
+    </div>
+  </div>
+</div>
+
+<!-- VISIT NOTE FORM -->
+<div class="overlay hidden" id="visit-form-overlay" onclick="closeVisitForm(event)">
+  <div class="prod-modal" id="visit-form-modal">
+    <div class="pm-handle"></div>
+    <div class="pm-name">Add Visit Note</div>
+    <div class="pm-details" style="grid-template-columns:1fr">
+      <div class="pm-det full">
+        <div class="pm-det-label">Note *</div>
+        <textarea class="order-cust-inp" id="visit-note" rows="4" placeholder="What happened on this visit?" style="resize:vertical"></textarea>
+      </div>
+    </div>
+    <div class="intel-form-error" id="visit-form-error">&nbsp;</div>
+    <div class="pm-actions">
+      <button class="pm-btn-close" onclick="closeVisitForm()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <button class="pm-btn-add" style="flex:1" onclick="submitVisitForm()">Save Note</button>
+    </div>
+  </div>
+</div>
+
+<!-- SAVED DRAFTS -->
+<div class="overlay hidden" id="drafts-overlay" onclick="closeDraftsList(event)">
+  <div class="prod-modal" id="drafts-modal">
+    <div class="pm-handle"></div>
+    <div class="pm-name">Saved Drafts</div>
+    <div id="drafts-list" class="drafts-list"></div>
+    <div class="pm-actions">
+      <button class="pm-btn-close" style="width:100%" onclick="closeDraftsList()">Close</button>
+    </div>
+  </div>
+</div>
 
 <!-- CUSTOMER DETAIL MODAL -->
 <div class="overlay hidden" id="cust-overlay" onclick="closeCustModal(event)">
@@ -222,6 +365,12 @@
     </div>
     <div class="cm-spark-row" id="cm-spark-row"></div>
     <div class="cm-stats" id="cm-stats"></div>
+    <div class="cm-section-title">Contacts</div>
+    <div class="cm-contacts" id="cm-contacts"></div>
+    <button class="cm-add-btn" onclick="openContactForm()">+ Add Contact</button>
+    <div class="cm-section-title">Visit Notes</div>
+    <div class="cm-visits" id="cm-visits"></div>
+    <button class="cm-add-btn" onclick="openVisitForm()">+ Add Visit Note</button>
     <div class="cm-section-title">Monthly Revenue</div>
     <div class="cm-monthly-rev" id="cm-monthly-rev"></div>
     <div class="cm-section-title">Top 5 Products (YTD)</div>
@@ -239,7 +388,11 @@
 </div>
 
   <nav class="bottom-nav">
-    <button class="bnav active" id="bnav-target" onclick="switchTab('target')">
+    <button class="bnav active" id="bnav-today" onclick="switchTab('today')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 15l2 2 4-4"/></svg>
+      <span>Today</span>
+    </button>
+    <button class="bnav" id="bnav-target" onclick="switchTab('target')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
       <span>Target</span>
     </button>
@@ -263,6 +416,10 @@
     <button class="bnav" id="bnav-customers" onclick="switchTab('customers')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       <span>Customers</span>
+    </button>
+    <button class="bnav" id="bnav-intel" onclick="switchTab('intel')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span>Intel</span>
     </button>
   </nav>
 

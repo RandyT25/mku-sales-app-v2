@@ -499,7 +499,7 @@ var TOOLKIT = {
       title: { en: "Berggold Mozzarella — Full Training", id: "Berggold Mozzarella — Pelatihan Lengkap" },
       division: "MKU",
       color: "#C8242A",
-      icon: "🧀",
+      icon: "cheese",
       sections: [
         {
           heading: { en: "What is it?", id: "Apa ini?" },
@@ -536,7 +536,7 @@ var TOOLKIT = {
       title: { en: "Wagyu — Sales Training", id: "Wagyu — Pelatihan Penjualan" },
       division: "MKS",
       color: "#163C70",
-      icon: "🐄",
+      icon: "cow",
       sections: [
         {
           heading: { en: "What is Wagyu?", id: "Apa itu Wagyu?" },
@@ -573,7 +573,7 @@ var TOOLKIT = {
       title: { en: "Sriboga Fusion Flour — Full Range", id: "Tepung Sriboga Fusion — Rangkaian Lengkap" },
       division: "MKS",
       color: "#1A7A45",
-      icon: "🌾",
+      icon: "wheat",
       sections: [
         {
           heading: { en: "Hime Fusion — Japanese Bread Flour", id: "Hime Fusion — Tepung Roti Jepang" },
@@ -617,7 +617,7 @@ var TOOLKIT = {
       title: { en: "Japanese Condiments — Reference Card", id: "Kondimen Jepang — Kartu Referensi" },
       division: "MKU",
       color: "#B07D1A",
-      icon: "🍱",
+      icon: "bento",
       sections: [
         {
           heading: { en: "Core Sushi Condiments", id: "Kondimen Sushi Utama" },
@@ -647,7 +647,7 @@ var TOOLKIT = {
       title: { en: "Chinese Condiments — Reference Card", id: "Kondimen China — Kartu Referensi" },
       division: "MKS",
       color: "#6B3FA0",
-      icon: "🥡",
+      icon: "takeout",
       sections: [
         {
           heading: { en: "Sauces & Seasonings", id: "Saus & Bumbu Masak" },
@@ -670,7 +670,7 @@ var TOOLKIT = {
       title: { en: "Italian Products — Reference Card", id: "Produk Italia — Kartu Referensi" },
       division: "MKU",
       color: "#1A6B7A",
-      icon: "🍝",
+      icon: "pasta",
       sections: [
         {
           heading: { en: "O'Sole Olives & Preserved Vegetables", id: "O'Sole Olives & Sayuran Awetan" },
@@ -693,7 +693,7 @@ var TOOLKIT = {
       title: { en: "User Development Framework (Bakery Sales)", id: "User Development Framework (Penjualan Bakery)" },
       division: "MKS",
       color: "#7A3A1A",
-      icon: "🎯",
+      icon: "target",
       sections: [
         {
           heading: { en: "The 8-Step Process", id: "Proses 8 Langkah" },
@@ -716,7 +716,7 @@ var TOOLKIT = {
       title: { en: "Canary Butter (NZ) — Full Training", id: "Canary Butter (NZ) — Pelatihan Lengkap" },
       division: "MKS",
       color: "#D4A017",
-      icon: "🧈",
+      icon: "butter",
       sections: [
         {
           heading: { en: "What is Canary?", id: "Apa itu Canary?" },
