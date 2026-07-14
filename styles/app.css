@@ -440,6 +440,8 @@ input { font-family: var(--sans); }
 .pl-divtab span { font-size: .68rem; font-family: var(--mono); background: var(--surface); padding: 1px 5px; border-radius: var(--r-sm); margin-left: 4px; color: var(--txt3); }
 .pl-divtab.active { color: var(--red); background: var(--surface); box-shadow: var(--shadow-card); }
 .pl-divtab.active span { background: var(--red-l); color: var(--red); }
+.pl-divtab.mks.active { color: var(--blue); }
+.pl-divtab.mks.active span { background: var(--blue-l); color: var(--blue); }
 
 .pl-cats {
   display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none;
@@ -506,8 +508,20 @@ input { font-family: var(--sans); }
 .order-cust-inp:focus { border-color: var(--red); background: var(--surface); box-shadow: 0 0 0 3px var(--red-l); }
 .order-cust-inp::placeholder { color: var(--txt3); }
 
-.order-cust-row { display: flex; gap: 7px; }
+.order-cust-row { display: flex; gap: 7px; position: relative; }
 .order-cust-row .order-cust-inp { flex: 1; }
+.order-cust-dropdown {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 25;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 11px;
+  box-shadow: var(--shadow-card); max-height: 260px; overflow-y: auto;
+}
+.order-cust-opt {
+  padding: 10px 13px; font-size: .82rem; color: var(--txt);
+  border-bottom: 1px solid var(--border); cursor: pointer;
+}
+.order-cust-opt:last-child { border-bottom: none; }
+.order-cust-opt:active { background: var(--red-l); }
+.order-cust-opt-area { font-size: .68rem; color: var(--txt3); margin-top: 1px; }
 .order-drafts-btn {
   position: relative; flex-shrink: 0; width: 40px; border-radius: 11px;
   border: 1px solid var(--border); background: var(--surface2); color: var(--txt2);
@@ -627,6 +641,7 @@ input { font-family: var(--sans); }
   transition: background 0.18s, color 0.18s, box-shadow 0.18s;
 }
 .sdiv.active { color: var(--red); background: var(--surface); box-shadow: var(--shadow-card); }
+.sdiv.mks.active { color: var(--blue); }
 
 #stock-list { padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; }
 .sk-card {
@@ -947,11 +962,19 @@ input { font-family: var(--sans); }
 /* ── TOOLKIT ── */
 .toolkit-wrap { padding: 0 0 8px; }
 
+.toolkit-tabs-wrap {
+  position: sticky; top: 0; z-index: 20;
+}
+.toolkit-tabs-wrap::after {
+  content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 28px;
+  background: linear-gradient(to right, transparent, var(--surface));
+  pointer-events: none;
+}
 .toolkit-tabs {
   display: flex; gap: 0; background: var(--surface);
   border-bottom: 1px solid var(--border);
-  position: sticky; top: 0; z-index: 20;
   overflow-x: auto; scrollbar-width: none;
+  padding-right: 28px;
 }
 .toolkit-tabs::-webkit-scrollbar { display: none; }
 .tk-tab {
@@ -1085,11 +1108,6 @@ input { font-family: var(--sans); }
   border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
   color: #fff; font-weight: 800; letter-spacing: -0.2px;
 }
-
-/* ── BOTTOM NAV — scrollable for 6 tabs ── */
-.bottom-nav { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-.bottom-nav::-webkit-scrollbar { display: none; }
-.bnav { min-width: 58px; flex-shrink: 0; }
 
 /* ── TOOLKIT LANGUAGE BAR ── */
 .tk-lang-bar { display:flex; align-items:center; justify-content:flex-end; padding:8px 14px; background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:41px; z-index:20; }

@@ -80,7 +80,7 @@
         </div>
         <div class="pl-divtabs" id="pl-divtabs">
           <button class="pl-divtab active" onclick="switchDiv('MKU', this)">MKU <span id="mku-count"></span></button>
-          <button class="pl-divtab" onclick="switchDiv('MKS', this)">MKS <span id="mks-count"></span></button>
+          <button class="pl-divtab mks" onclick="switchDiv('MKS', this)">MKS <span id="mks-count"></span></button>
         </div>
         <div class="pl-cats" id="pl-cats"></div>
       </div>
@@ -90,12 +90,12 @@
     <div class="screen" id="screen-order">
       <div class="order-meta-bar">
         <div class="order-cust-row">
-          <input class="order-cust-inp" id="order-cust" list="order-cust-datalist" placeholder="Customer / outlet name…" autocomplete="off" oninput="onOrderCustInput(this.value)">
-          <datalist id="order-cust-datalist"></datalist>
+          <input class="order-cust-inp" id="order-cust" placeholder="Customer / outlet name…" autocomplete="off" oninput="onOrderCustInput(this.value)" onfocus="onOrderCustInput(this.value)">
           <button class="order-drafts-btn" onclick="openDraftsList()" title="Saved drafts">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h6l2 2h8v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>
             <span id="order-drafts-count" class="order-drafts-count hidden">0</span>
           </button>
+          <div class="order-cust-dropdown hidden" id="order-cust-dropdown"></div>
         </div>
         <input class="order-cust-inp" id="order-notes" placeholder="Notes (optional)" autocomplete="off">
       </div>
@@ -119,7 +119,7 @@
       </div>
       <div class="stock-divtabs">
         <button class="sdiv active" onclick="switchStockDiv('MKU',this)">MKU</button>
-        <button class="sdiv" onclick="switchStockDiv('MKS',this)">MKS</button>
+        <button class="sdiv mks" onclick="switchStockDiv('MKS',this)">MKS</button>
       </div>
       <div id="stock-list"></div>
     </div>
@@ -127,12 +127,14 @@
     <div class="screen" id="screen-catalog">
       <div class="toolkit-wrap">
 
-        <div class="toolkit-tabs">
-          <button class="tk-tab active" id="tktab-catalogs"  onclick="switchToolkit('catalogs',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Catalogs</button>
-          <button class="tk-tab"        id="tktab-spotlight" onclick="switchToolkit('spotlight',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Spotlight</button>
-          <button class="tk-tab"        id="tktab-faq"       onclick="switchToolkit('faq',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>FAQ</button>
-          <button class="tk-tab"        id="tktab-battle"    onclick="switchToolkit('battle',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l12 12M18 4L6 16"/><path d="M4 20l3-3M17 17l3 3"/></svg>Battle</button>
-          <button class="tk-tab"        id="tktab-modules"   onclick="switchToolkit('modules',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>Modules</button>
+        <div class="toolkit-tabs-wrap">
+          <div class="toolkit-tabs">
+            <button class="tk-tab active" id="tktab-catalogs"  onclick="switchToolkit('catalogs',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Catalogs</button>
+            <button class="tk-tab"        id="tktab-spotlight" onclick="switchToolkit('spotlight',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Spotlight</button>
+            <button class="tk-tab"        id="tktab-faq"       onclick="switchToolkit('faq',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>FAQ</button>
+            <button class="tk-tab"        id="tktab-battle"    onclick="switchToolkit('battle',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l12 12M18 4L6 16"/><path d="M4 20l3-3M17 17l3 3"/></svg>Battle</button>
+            <button class="tk-tab"        id="tktab-modules"   onclick="switchToolkit('modules',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>Modules</button>
+          </div>
         </div>
         <div class="tk-lang-bar" id="tk-lang-bar" style="display:none">
           <div class="tk-lang-toggle" onclick="toggleTkLang()">
