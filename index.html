@@ -20,6 +20,8 @@
   <script type="module" src="features/customer-identity.js"></script>
   <script type="module" src="features/customer-relations.js"></script>
   <script type="module" src="features/today-priorities.js"></script>
+  <script type="module" src="features/announcements.js"></script>
+  <script type="module" src="features/rep-profile.js"></script>
 </head>
 <body>
 
@@ -42,10 +44,12 @@
       <button class="back-btn" onclick="logout()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
-      <div class="topbar-avatar" id="topbar-avatar">—</div>
-      <div class="topbar-identity">
-        <div class="topbar-name" id="topbar-name">—</div>
-        <div class="topbar-area" id="topbar-area">—</div>
+      <div class="topbar-identity-wrap" onclick="openProfile()">
+        <div class="topbar-avatar" id="topbar-avatar">—</div>
+        <div class="topbar-identity">
+          <div class="topbar-name" id="topbar-name">—</div>
+          <div class="topbar-area" id="topbar-area">—</div>
+        </div>
       </div>
     </div>
     <div class="topbar-right">
@@ -208,6 +212,9 @@
         <div class="cust-search-wrap">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;color:var(--txt3)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input class="pl-search" id="cust-search-inp" type="search" placeholder="Search customer…" oninput="onCustSearch(this.value)" autocomplete="off">
+          <button class="cust-contacts-btn hidden" id="cust-contacts-btn" onclick="openContactsDirectory()" title="Contacts directory">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </button>
         </div>
         <div class="cust-filters">
           <button class="cf active" onclick="filterCustGroup('all',this)">All</button>
@@ -240,6 +247,10 @@
           <svg class="pl-search-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input class="pl-search" id="intel-search-inp" type="search" placeholder="Search competitor or product…" oninput="onIntelSearch(this.value)" autocomplete="off">
         </div>
+        <div class="intel-view-tabs">
+          <button class="intel-view-tab active" onclick="switchIntelView('recent',this)">Recent</button>
+          <button class="intel-view-tab" onclick="switchIntelView('summary',this)">By Competitor</button>
+        </div>
       </div>
       <div id="intel-list"></div>
       <button class="intel-fab" onclick="openIntelForm()">
@@ -254,7 +265,7 @@
 <div class="overlay hidden" id="intel-form-overlay" onclick="closeIntelForm(event)">
   <div class="prod-modal" id="intel-form-modal">
     <div class="pm-handle"></div>
-    <div class="pm-name">Log Competitor Price</div>
+    <div class="pm-name" id="intel-form-title">Log Competitor Price</div>
     <div class="pm-details" style="grid-template-columns:1fr">
       <div class="pm-det full">
         <div class="pm-det-label">Competitor Name *</div>
@@ -354,6 +365,77 @@
     <div class="pm-actions">
       <button class="pm-btn-close" style="width:100%" onclick="closeDraftsList()">Close</button>
     </div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div class="overlay hidden" id="profile-overlay" onclick="closeProfile(event)">
+  <div class="prod-modal" id="profile-modal">
+    <div class="pm-handle"></div>
+    <div class="pm-name">My Profile</div>
+    <div class="profile-photo-row">
+      <div id="profile-avatar-preview"></div>
+      <label class="profile-upload-btn">
+        Change Photo
+        <input type="file" id="profile-photo-input" accept="image/*" style="display:none" onchange="onProfilePhotoSelected(this.files[0])">
+      </label>
+    </div>
+    <div class="pm-details" style="grid-template-columns:1fr">
+      <div class="pm-det full">
+        <div class="pm-det-label">Name</div>
+        <input class="order-cust-inp" id="profile-name" disabled style="opacity:0.6">
+      </div>
+      <div class="pm-det full">
+        <div class="pm-det-label">Phone</div>
+        <input class="order-cust-inp" id="profile-phone" placeholder="Optional" autocomplete="off">
+      </div>
+    </div>
+    <div class="intel-form-error" id="profile-form-error">&nbsp;</div>
+    <div class="pm-actions">
+      <button class="pm-btn-close" onclick="closeProfile()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <button class="pm-btn-add" style="flex:1" onclick="submitProfileForm()">Save</button>
+    </div>
+    <button class="profile-changepin-btn" onclick="openChangePin()">Change PIN</button>
+  </div>
+</div>
+
+<!-- CHANGE PIN (from Profile) -->
+<div class="overlay hidden" id="change-pin-overlay" onclick="closeChangePin(event)">
+  <div class="prod-modal" id="change-pin-modal">
+    <div class="pm-handle"></div>
+    <div class="pm-name" id="change-pin-title">Choose a new PIN</div>
+    <div class="login-pin-dots" id="change-pin-dots"></div>
+    <div class="login-pin-error" id="change-pin-error">&nbsp;</div>
+    <div class="login-pin-keypad" id="change-pin-keypad">
+      <button class="login-pin-key" onclick="onChangePinDigit('1')">1</button>
+      <button class="login-pin-key" onclick="onChangePinDigit('2')">2</button>
+      <button class="login-pin-key" onclick="onChangePinDigit('3')">3</button>
+      <button class="login-pin-key" onclick="onChangePinDigit('4')">4</button>
+      <button class="login-pin-key" onclick="onChangePinDigit('5')">5</button>
+      <button class="login-pin-key" onclick="onChangePinDigit('6')">6</button>
+      <button class="login-pin-key" onclick="onChangePinDigit('7')">7</button>
+      <button class="login-pin-key" onclick="onChangePinDigit('8')">8</button>
+      <button class="login-pin-key" onclick="onChangePinDigit('9')">9</button>
+      <button class="login-pin-key login-pin-key--ghost" tabindex="-1"></button>
+      <button class="login-pin-key" onclick="onChangePinDigit('0')">0</button>
+      <button class="login-pin-key login-pin-key--action" onclick="onChangePinBackspace()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><path d="M18 9l-6 6M12 9l6 6"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACTS DIRECTORY (Manager) -->
+<div class="overlay hidden" id="contacts-directory-overlay" onclick="closeContactsDirectory(event)">
+  <div class="prod-modal" id="contacts-directory-modal">
+    <div class="pm-handle"></div>
+    <div class="pm-name">Contacts Directory</div>
+    <div class="order-cust-row" style="padding:0 14px 10px">
+      <input class="order-cust-inp" id="contacts-directory-search" placeholder="Search name, customer, or phone…" autocomplete="off" oninput="onContactsDirectorySearch(this.value)">
+    </div>
+    <div id="contacts-directory-list" class="drafts-list"></div>
   </div>
 </div>
 
@@ -631,9 +713,50 @@ _loadScript(
   <div class="ann-panel" id="ann-panel">
     <div class="ann-panel-header">
       <div class="ann-panel-title">Announcements</div>
+      <button class="ann-new hidden" id="ann-new-btn" onclick="openSendAnnouncement()">+ New</button>
       <button class="ann-close" onclick="closeAnnouncements()">✕</button>
     </div>
     <div class="ann-list" id="ann-list"></div>
+  </div>
+</div>
+
+<!-- SEND NOTIFICATION (Manager) -->
+<div class="overlay hidden" id="send-ann-overlay" onclick="closeSendAnnouncement(event)">
+  <div class="prod-modal" id="send-ann-modal">
+    <div class="pm-handle"></div>
+    <div class="pm-name">Send Notification</div>
+    <div class="pm-details" style="grid-template-columns:1fr">
+      <div class="pm-det full">
+        <div class="pm-det-label">Title *</div>
+        <input class="order-cust-inp" id="ann-title" placeholder="e.g. New Pricing Policy" autocomplete="off">
+      </div>
+      <div class="pm-det full">
+        <div class="pm-det-label">Message *</div>
+        <input class="order-cust-inp" id="ann-message" placeholder="Message" autocomplete="off">
+      </div>
+      <div class="pm-det full">
+        <div class="pm-det-label">Category</div>
+        <select class="order-cust-inp" id="ann-category">
+          <option value="General">General</option>
+          <option value="Urgent">Urgent</option>
+          <option value="Promo">Promo</option>
+          <option value="Product">Product</option>
+        </select>
+      </div>
+      <div class="pm-det full">
+        <div class="pm-det-label">Send To</div>
+        <select class="order-cust-inp" id="ann-target">
+          <option value="">Everyone</option>
+        </select>
+      </div>
+    </div>
+    <div class="intel-form-error" id="ann-form-error">&nbsp;</div>
+    <div class="pm-actions">
+      <button class="pm-btn-close" onclick="closeSendAnnouncement()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <button class="pm-btn-add" style="flex:1" onclick="submitSendAnnouncement()">Send</button>
+    </div>
   </div>
 </div>
 

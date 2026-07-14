@@ -15,6 +15,17 @@ export async function createContact(entry) {
   if (error) throw error;
 }
 
+// Manager-facing directory — every contact across every customer, not scoped
+// to one customer_id like fetchContacts() above.
+export async function fetchAllContacts() {
+  const { data, error } = await supabase
+    .from('customer_contacts')
+    .select('id, name, role, phone, customer_id, customers(name, area)')
+    .order('name', { ascending: true });
+  if (error) throw error;
+  return data;
+}
+
 export async function updateContact(id, fields) {
   const { error } = await supabase.from('customer_contacts').update(fields).eq('id', id);
   if (error) throw error;
@@ -40,4 +51,4 @@ export async function createVisit(entry) {
   if (error) throw error;
 }
 
-window.CustomerRelations = { fetchContacts, createContact, updateContact, deleteContact, fetchVisits, createVisit };
+window.CustomerRelations = { fetchContacts, createContact, updateContact, deleteContact, fetchVisits, createVisit, fetchAllContacts };

@@ -219,6 +219,8 @@ input { font-family: var(--sans); }
   padding: 0 16px; flex-shrink: 0; position: relative; z-index: 30;
 }
 .topbar-left { display: flex; align-items: center; gap: 10px; }
+.topbar-identity-wrap { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.topbar-identity-wrap:active { opacity: 0.7; }
 .back-btn {
   width: 32px; height: 32px; border-radius: var(--r-sm); border: 1px solid var(--border);
   background: var(--bg); display: flex; align-items: center; justify-content: center;
@@ -701,6 +703,16 @@ input { font-family: var(--sans); }
 .pm-btn-add { flex: 1; padding: 13px; border-radius: var(--r-md); border: none; background: var(--red); color: white; font-size: .85rem; font-weight: 700; }
 .pm-btn-close { width: 44px; padding: 13px; border-radius: var(--r-md); border: 1.5px solid var(--border); background: var(--surface); font-size: 1rem; color: var(--txt2); }
 
+/* ── PROFILE ── */
+.profile-photo-row { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 6px 20px 18px; }
+.profile-upload-btn { font-size: .78rem; font-weight: 700; color: var(--red); cursor: pointer; }
+.profile-changepin-btn {
+  width: calc(100% - 40px); margin: 10px 20px 20px; padding: 12px;
+  border-radius: var(--r-md); border: 1.5px solid var(--border); background: var(--surface);
+  font-size: .82rem; font-weight: 700; color: var(--txt2);
+}
+#change-pin-modal .login-pin-dots { margin-top: 14px; }
+
 /* ── TOAST ── */
 .toast {
   position: fixed; bottom: calc(var(--nav-h) + 14px); left: 50%;
@@ -821,49 +833,13 @@ input { font-family: var(--sans); }
   margin: 0 auto;
 }
 
-/* ── MOBILE FONT SCALE-DOWN ── */
+/* ── MOBILE NAV FIT ── */
+/* Bottom nav is the only thing still deliberately scaled down on narrow
+   phones — 8 equal-width tabs need this to avoid the overflow bug fixed
+   earlier. Everything else here used to also shrink the whole app's root
+   font-size and a few dozen data-text elements on top of that, making
+   Target/Customers/Pricelist/Stock numbers uncomfortably small — removed. */
 @media (max-width: 420px) {
-  :root { font-size: 14px; }
-
-  /* Topbar */
-  .topbar-name { font-size: .82rem; }
-  .topbar-area { font-size: .62rem; }
-
-  /* Target hero */
-  .th-pct { font-size: 2.4rem; }
-  .th-mini-val { font-size: .75rem; }
-  .th-mini-label { font-size: .58rem; }
-  .th-mini-pct { font-size: .6rem; }
-  .th-rep { font-size: 1.1rem; }
-  .th-month { font-size: .65rem; }
-  .th-status-tag { font-size: .65rem; }
-
-  /* Cards */
-  .gc-val { font-size: .82rem; }
-  .gc-label { font-size: .65rem; }
-  .gc-sub { font-size: .6rem; }
-  .ac-name { font-size: .75rem; }
-  .ac-area { font-size: .62rem; }
-  .ac-pct { font-size: .72rem; }
-  .mc-bar-label { font-size: .72rem; }
-  .mc-bar-nums { font-family: var(--mono); font-size: .65rem; }
-
-  /* Pricelist */
-  .pl-card-name { font-size: .75rem; }
-  .pl-card-price-val { font-size: .75rem; }
-  .pl-card-tag { font-size: .58rem; }
-
-  /* Order */
-  .oi-name { font-size: .75rem; }
-  .oi-tier { font-size: .62rem; }
-  .oi-price-total { font-size: .75rem; }
-  .os-row.total span:last-child { font-size: .9rem; }
-
-  /* Stock */
-  .sk-name { font-size: .75rem; }
-  .sk-qty { font-size: .82rem; }
-
-  /* Bottom nav */
   .bnav { font-size: .6rem; }
   .bnav svg { width: 20px; height: 20px; }
 }
@@ -929,7 +905,8 @@ input { font-family: var(--sans); }
   padding: 14px 16px; border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
-.ann-panel-title { font-size: .9rem; font-weight: 700; }
+.ann-panel-title { font-size: .9rem; font-weight: 700; flex: 1; }
+.ann-new { flex-shrink: 0; margin-right: 8px; padding: 6px 12px; border-radius: var(--r-pill); border: none; background: var(--red-l); color: var(--red); font-size: .74rem; font-weight: 700; }
 .ann-close {
   width: 28px; height: 28px; border-radius: 50%;
   border: none; background: var(--bg);
@@ -1141,6 +1118,11 @@ input { font-family: var(--sans); }
 .cust-header { background:var(--surface); border-bottom:1px solid var(--border); padding:10px 12px 0; position:sticky; top:0; z-index:20; }
 .cust-search-wrap { display:flex; align-items:center; gap:8px; background:var(--surface2); border-radius: var(--r-md); padding:0 10px; border:1px solid var(--border); box-shadow: var(--shadow-card); margin-bottom:8px; height:40px; }
 .cust-search-wrap .pl-search { border:none; background:transparent; flex:1; font-size:.85rem; outline:none; }
+.cust-contacts-btn { flex-shrink:0; width:30px; height:30px; border-radius:50%; border:none; background:var(--bg); color:var(--txt2); display:flex; align-items:center; justify-content:center; }
+.contacts-dir-card { background: var(--surface); border-radius: var(--r-md); box-shadow: var(--shadow-card); padding: 12px 13px; margin-bottom: 8px; }
+.contacts-dir-name { font-size: .85rem; font-weight: 700; }
+.contacts-dir-meta { font-size: .72rem; color: var(--txt2); margin-top: 2px; }
+.contacts-dir-cust { font-size: .68rem; color: var(--txt3); margin-top: 4px; }
 .cust-filters { display:flex; gap:6px; overflow-x:auto; padding-bottom:8px; scrollbar-width:none; }
 .cust-filters::-webkit-scrollbar { display:none; }
 .cf { white-space:nowrap; font-size:.72rem; font-weight:600; padding:4px 10px; border-radius: var(--r-pill); border:1.5px solid var(--border); background:var(--bg); color:var(--txt3); cursor:pointer; flex-shrink:0; }
@@ -1239,6 +1221,18 @@ input { font-family: var(--sans); }
 
 /* ── COMPETITOR INTEL ── */
 .intel-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 14px; position: sticky; top: 0; z-index: 20; }
+.intel-view-tabs { display: flex; gap: 2px; margin-top: 8px; padding: 3px; background: var(--bg); border-radius: var(--r-md); }
+.intel-view-tab {
+  flex: 1; padding: 7px 12px; border: none; border-radius: var(--r-sm);
+  background: transparent; font-size: .78rem; font-weight: 600; color: var(--txt3);
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+}
+.intel-view-tab.active { color: var(--red); background: var(--surface); box-shadow: var(--shadow-card); }
+.intel-sum-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.intel-sum-count { font-size: .68rem; color: var(--txt3); font-family: var(--mono); flex-shrink: 0; }
+.intel-sum-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0; border-top: 1px solid var(--border); }
+.intel-sum-prod { font-size: .78rem; color: var(--txt2); }
+.intel-sum-price { font-size: .78rem; font-weight: 700; color: var(--txt); font-family: var(--mono); flex-shrink: 0; }
 #intel-list { padding: 10px 14px calc(var(--nav-h) + 60px); display: flex; flex-direction: column; gap: 8px; }
 .intel-card { background: var(--surface); border-radius: var(--r-md); box-shadow: var(--shadow-card); padding: 12px 13px; }
 .intel-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
@@ -1252,6 +1246,8 @@ input { font-family: var(--sans); }
 .intel-card-foot { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
 .intel-card-rep { font-size: .68rem; font-weight: 600; color: var(--txt2); flex: 1; }
 .intel-card-date { font-size: .65rem; color: var(--txt3); font-family: var(--mono); }
+.intel-card-actions { display: flex; gap: 4px; flex-shrink: 0; }
+.intel-card-actions button { width: 24px; height: 24px; border-radius: 50%; border: none; background: var(--bg); color: var(--txt2); display: flex; align-items: center; justify-content: center; }
 
 .intel-fab {
   position: fixed; bottom: calc(var(--nav-h) + 14px); left: 14px; right: 14px;

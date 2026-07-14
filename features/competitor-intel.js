@@ -14,4 +14,14 @@ export async function createLog(entry) {
   if (error) throw error;
 }
 
-window.CompetitorIntel = { fetchLogs, createLog };
+export async function updateLog(id, patch) {
+  const { error } = await supabase.from('competitor_logs').update(patch).eq('id', id);
+  if (error) throw error;
+}
+
+export async function deleteLog(id) {
+  const { error } = await supabase.from('competitor_logs').delete().eq('id', id);
+  if (error) throw error;
+}
+
+window.CompetitorIntel = { fetchLogs, createLog, updateLog, deleteLog };
