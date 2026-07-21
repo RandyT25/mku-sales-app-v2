@@ -609,11 +609,45 @@ function _dataLoaded() {
   clearInterval(_barTimer);
   const b = document.getElementById('load-bar');
   if (b) b.style.width = '100%';
-  // Load the app JS, then show login
-  _loadScript('lib/app-core.js?v=' + new Date().toISOString().slice(0,13), _showLogin, function() {
+  // Load the app JS, then check for a restorable session before deciding
+  // whether the rep-picker/PIN screen needs to be shown at all.
+  _loadScript('lib/app-core.js?v=' + new Date().toISOString().slice(0,13), _bootAuth, function() {
     document.getElementById('load-msg').textContent = 'App failed to load — try refreshing';
     document.getElementById('load-msg').style.color = '#F08080';
   });
+}
+
+// _showLogin() + selectRep() are both synchronous, so calling them back to
+// back here (after the one async restoreSession() await) means the browser
+// never gets a chance to paint the rep-picker frame in between — a rep with
+// a still-valid session goes straight into the app with no visible flash of
+// the login screen on a normal reload. _showLogin() still always runs first
+// so the picker DOM/dropdown exists underneath for when logout() is used.
+function _bootAuth() {
+  waitForGlobal('AppAuth').then(() => window.AppAuth.restoreSession()).then(repRow => {
+    _showLogin();
+    if (repRow) {
+      const idx = REP_CONFIG.findIndex(r => r.name === repRow.name);
+      if (idx !== -1) {
+        selectRep(idx, { repId: repRow.id, authUserId: repRow.auth_user_id, isManager: repRow.is_manager, phone: repRow.phone, photoUrl: repRow.photo_url });
+      }
+    }
+  }).catch(e => { console.error('restoreSession error:', e); _showLogin(); });
+}
+
+// Re-fetch just the sales data feed in place (no page reload, no touching
+// login state) so a long-backgrounded app shows fresh numbers on resume
+// without disturbing the rep's session.
+function _refreshDataInPlace() {
+  _loadScript(
+    'https://randyt25.github.io/MKU-MKS-Area-Dashboard/data_sales.js?v=' + new Date().toISOString().slice(0,10),
+    function() {
+      if (window._currentRep && typeof renderTarget === 'function') {
+        try { renderTarget(); } catch (e) { console.error('renderTarget refresh error:', e); }
+      }
+    },
+    function() { console.warn('Background data refresh failed'); }
+  );
 }
 
 function _dataFailed() {
@@ -808,7 +842,8 @@ document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     _hiddenAt = Date.now();
   } else if (_hiddenAt && Date.now() - _hiddenAt > 10 * 60 * 1000) {
-    location.reload();
+    _hiddenAt = null;
+    _refreshDataInPlace();
   }
 });
 </script>
