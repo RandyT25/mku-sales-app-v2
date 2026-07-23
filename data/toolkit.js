@@ -32,28 +32,6 @@ var TOOLKIT = {
       focus: true
     },
     {
-      id: 2,
-      product: "Osterberg Fruit Crush Series",
-      category: { en: "Fruit Crush", id: "Fruit Crush" },
-      tagline: {
-        en: "Real fruit crush — not syrup, not concentrate",
-        id: "Fruit crush asli — bukan sirup, bukan konsentrat"
-      },
-      pitch: {
-        en: "Fruit Crush is the premium alternative to syrup. Real fruit pieces, better colour, better taste. Perfect for mocktails, smoothies, fruit teas. Hotels love it for presentation.",
-        id: "Fruit Crush adalah alternatif premium dari sirup. Ada buah aslinya, warna lebih bagus, rasa lebih enak. Cocok untuk mocktail, smoothie, fruit tea. Hotel sangat menyukai tampilannya."
-      },
-      target: {
-        en: "Hotel bar, pool bar, café, restaurant",
-        id: "Hotel bar, pool bar, café, restoran"
-      },
-      tip: {
-        en: "Bring a bottle to the visit. Let the outlet taste it. One taste usually closes the deal.",
-        id: "Bawa satu botol saat kunjungan. Biarkan outlet mencicipinya. Satu kali cicip biasanya langsung closing."
-      },
-      focus: true
-    },
-    {
       id: 3,
       product: "Berggold Pizza Topping Mozzarella",
       category: { en: "Butter & Mozzarella", id: "Butter & Mozzarella" },
@@ -200,17 +178,6 @@ var TOOLKIT = {
       answer: {
         en: "No strict MOQ for most products — reps can order per carton. Volume discounts apply at 6 cartons (−3%) and 11+ cartons (−5%). Confirm with Cost Control for special pricing.",
         id: "Tidak ada MOQ ketat untuk sebagian besar produk — sales bisa order per karton. Diskon volume berlaku di 6 karton (−3%) dan 11+ karton (−5%). Konfirmasi dengan Cost Control untuk harga khusus."
-      }
-    },
-    {
-      id: 4,
-      question: {
-        en: "What is the difference between Masterista Syrup and Osterberg Syrup?",
-        id: "Apa perbedaan Masterista Syrup dan Osterberg Syrup?"
-      },
-      answer: {
-        en: "Masterista Syrup (850ml, 6/case) is positioned for beverage stations — wider flavour range, Indonesian brand. Osterberg Syrup (750ml, 6/case) is a European brand, premium positioning, better for hotel bars and specialty cafés.",
-        id: "Masterista Syrup (850ml, 6/case) diposisikan untuk beverage station — pilihan rasa lebih luas, merek Indonesia. Osterberg Syrup (750ml, 6/case) adalah merek Eropa, positioning premium, lebih cocok untuk hotel bar dan specialty café."
       }
     },
     {
@@ -485,6 +452,206 @@ var TOOLKIT = {
           "Kuning alami = susu NZ grass-fed = sinyal kualitas yang dipercaya chef",
           "Keunggulan gizi: kaya Vitamin D, beta-karoten tinggi, kadar CLA tinggi",
           "Pendekatan trial: tawarkan satu karton Sheets untuk lini croissant/danish mereka saja"
+        ]
+      }
+    },
+    {
+      id: 8,
+      situation: {
+        en: "Customer wants a smaller trial than a full carton before committing to Berggold",
+        id: "Customer minta trial lebih kecil dari satu karton penuh sebelum committed ke Berggold"
+      },
+      response: {
+        en: "Don't say no to the ask, redirect it. A full carton is the standard order unit, but the trial doesn't need to use the whole thing to prove the point — offer to run the test on their single busiest shift so they see the stretch and melt under real pressure, not in a quiet kitchen. Ask: 'If it performs on your busiest night, are you ready to order?' Get a yes to that before scheduling the trial.",
+        id: "Jangan langsung menolak permintaannya, arahkan ulang. Satu karton adalah unit order standar, tapi trial tidak perlu menghabiskan semuanya untuk membuktikan poinnya — tawarkan untuk menjalankan test di shift tersibuk mereka supaya mereka lihat stretch dan meltingnya di bawah tekanan nyata, bukan di dapur yang sepi. Tanyakan: 'Kalau performanya bagus di malam tersibuk, apakah Anda siap order?' Dapatkan jawaban ya untuk itu sebelum menjadwalkan trial."
+      },
+      keypoints: {
+        en: [
+          "Don't refuse the smaller-trial ask outright — redirect to when/how, not whether",
+          "Schedule the trial on their busiest shift, not a quiet one — that's when quality actually gets tested",
+          "Get a conditional commitment ('if it works, you order') before running the trial",
+          "One carton is the standard order unit — the trial just needs the right conditions, not more product"
+        ],
+        id: [
+          "Jangan langsung menolak permintaan trial kecil — arahkan ke kapan/bagaimana, bukan apakah bisa",
+          "Jadwalkan trial di shift tersibuk mereka, bukan yang sepi — di situ kualitas benar-benar teruji",
+          "Dapatkan komitmen bersyarat ('kalau bagus, Anda order') sebelum menjalankan trial",
+          "Satu karton adalah unit order standar — trial hanya perlu kondisi yang tepat, bukan produk lebih banyak"
+        ]
+      }
+    },
+    {
+      id: 9,
+      situation: {
+        en: "Customer is worried about supply consistency — will Wagyu be available every month?",
+        id: "Customer khawatir soal konsistensi supply — apakah Wagyu akan selalu tersedia tiap bulan?"
+      },
+      response: {
+        en: "This is actually a buying signal, not a rejection — they're already thinking about putting it on the menu long-term. Ask what volume they'd realistically need per month first, so you're answering with their real number in mind, not a generic one. Be honest about lead times and confirm with Cost Control before promising a specific monthly quantity — never guess a number on the spot for an imported product.",
+        id: "Ini sebenarnya sinyal beli, bukan penolakan — mereka sudah berpikir untuk memasukkannya ke menu jangka panjang. Tanyakan dulu volume yang realistis mereka butuhkan per bulan, supaya jawaban Anda sesuai angka mereka, bukan jawaban umum. Jujur soal lead time dan konfirmasi dengan Cost Control sebelum menjanjikan kuantitas bulanan tertentu — jangan pernah menebak angka di tempat untuk produk impor."
+      },
+      keypoints: {
+        en: [
+          "Supply questions are a buying signal — the customer is already planning to commit",
+          "Ask their realistic monthly volume first, don't guess or promise a number on the spot",
+          "Always confirm supply/lead-time commitments with Cost Control before the customer, not after",
+          "Imported products need lead time — set that expectation honestly up front"
+        ],
+        id: [
+          "Pertanyaan supply adalah sinyal beli — customer sudah berencana untuk committed",
+          "Tanyakan dulu volume bulanan realistis mereka, jangan menebak atau menjanjikan angka di tempat",
+          "Selalu konfirmasi komitmen supply/lead-time ke Cost Control sebelum ke customer, bukan sesudah",
+          "Produk impor butuh lead time — sampaikan ekspektasi ini dengan jujur di awal"
+        ]
+      }
+    },
+    {
+      id: 10,
+      situation: {
+        en: "Kitchen staff resist changing their recipe/formula to a new flour, even if the chef agrees",
+        id: "Staf dapur menolak mengubah resep/formula ke tepung baru, walaupun chef sudah setuju"
+      },
+      response: {
+        en: "The chef saying yes doesn't mean the kitchen will actually switch — the people mixing dough every day are the real decision-makers on adoption. Ask the chef if you can spend 10 minutes with the baker directly, not just leave samples. Walk them through what changes in their process (hydration, mixing time) and what stays the same. Staff resist most when they think it means relearning everything — show them it's a small adjustment, not a new skill.",
+        id: "Chef bilang ya bukan berarti dapur benar-benar akan ganti — orang yang mixing adonan setiap hari adalah pengambil keputusan sebenarnya soal adopsi. Tanyakan ke chef apakah Anda bisa luangkan 10 menit langsung dengan baker-nya, bukan cuma titip sample. Jelaskan apa yang berubah dalam proses mereka (hidrasi, waktu mixing) dan apa yang tetap sama. Staf paling resisten kalau mereka pikir harus belajar ulang semuanya — tunjukkan ini penyesuaian kecil, bukan skill baru."
+      },
+      keypoints: {
+        en: [
+          "Chef approval ≠ kitchen adoption — the baker/staff who mix daily decide if it actually sticks",
+          "Ask to spend time with the staff directly, don't just leave samples with the chef",
+          "Be specific about what changes (hydration, mixing time) vs what stays the same",
+          "Frame it as a small adjustment, not a new skill — that's what staff actually fear"
+        ],
+        id: [
+          "Chef setuju ≠ dapur adopsi — baker/staf yang mixing setiap hari yang menentukan apakah benar-benar dipakai",
+          "Minta waktu langsung dengan staf, jangan cuma titip sample ke chef",
+          "Jelaskan spesifik apa yang berubah (hidrasi, waktu mixing) vs yang tetap sama",
+          "Posisikan sebagai penyesuaian kecil, bukan skill baru — itu yang sebenarnya ditakutkan staf"
+        ]
+      }
+    },
+    {
+      id: 11,
+      situation: {
+        en: "Customer says matcha is niche/low-demand, not worth the menu space",
+        id: "Customer bilang matcha itu niche/permintaan rendah, tidak sepadan dengan ruang di menu"
+      },
+      response: {
+        en: "Don't argue that matcha is mainstream — it isn't everywhere yet, and that's the point. Reframe from 'demand today' to 'margin per cup and photo-worthiness.' A ceremonial matcha drink has a strong visual (colour, latte art) that customers photograph and share, and the cost per serving is low enough that even modest volume pays for the shelf space. Suggest starting with one signature drink, not a whole new menu section — lower risk, easy to test.",
+        id: "Jangan berargumen bahwa matcha sudah mainstream — memang belum di mana-mana, dan itu justru poinnya. Alihkan dari 'demand hari ini' ke 'margin per gelas dan daya tarik foto.' Minuman matcha ceremonial punya visual yang kuat (warna, latte art) yang biasa difoto dan dibagikan customer, dan biaya per sajian cukup rendah sehingga volume sedang saja sudah menutup ruang menu. Sarankan mulai dengan satu signature drink, bukan seluruh bagian menu baru — risiko lebih rendah, mudah dicoba."
+      },
+      keypoints: {
+        en: [
+          "Don't overclaim mainstream demand — sell the margin and visual appeal instead",
+          "Ceremonial grade = strong colour/latte art = social-media-friendly, drives organic promotion",
+          "Cost per serving is low (~Rp 6K/serving) — even modest volume justifies the space",
+          "Suggest one signature drink to start, not a menu overhaul — lowers the risk of saying yes"
+        ],
+        id: [
+          "Jangan overclaim soal demand mainstream — jual margin dan daya tarik visualnya",
+          "Grade ceremonial = warna/latte art kuat = ramah media sosial, mendorong promosi organik",
+          "Biaya per sajian rendah (~Rp 6K/sajian) — volume sedang saja sudah sepadan",
+          "Sarankan satu signature drink untuk mulai, bukan rombak menu — menurunkan risiko untuk bilang ya"
+        ]
+      }
+    },
+    {
+      id: 12,
+      situation: {
+        en: "Customer seemed positive during the visit but goes quiet afterward — no reply to follow-up",
+        id: "Customer terlihat positif saat kunjungan tapi menghilang setelahnya — tidak membalas follow-up"
+      },
+      response: {
+        en: "A good visit with no follow-through usually means they got busy, not that they said no. Don't send a generic 'just checking in' message — reference something specific from the visit (the product they liked, the price they asked about) so it's easy for them to pick the thread back up. If there's still no reply after two tries, switch channels — call instead of WhatsApp, or time your visit around when they're less busy (before lunch service, not during).",
+        id: "Kunjungan yang bagus tanpa tindak lanjut biasanya berarti mereka sibuk, bukan menolak. Jangan kirim pesan generik 'cek-cek aja' — sebut sesuatu yang spesifik dari kunjungan (produk yang mereka suka, harga yang mereka tanyakan) supaya mudah bagi mereka melanjutkan percakapan. Kalau masih tidak dibalas setelah dua kali coba, ganti channel — telepon daripada WhatsApp, atau atur waktu kunjungan di saat mereka tidak sibuk (sebelum jam makan siang, bukan saat itu)."
+      },
+      keypoints: {
+        en: [
+          "Silence after a good visit is usually 'busy', not 'no' — don't over-interpret it",
+          "Reference something specific from the visit in your follow-up, not a generic check-in",
+          "After two unanswered follow-ups, switch channels (call instead of chat)",
+          "Time visits/follow-ups around their slow hours, not peak service"
+        ],
+        id: [
+          "Diam setelah kunjungan bagus biasanya berarti 'sibuk', bukan 'tidak' — jangan terlalu diartikan",
+          "Sebut sesuatu yang spesifik dari kunjungan di follow-up, bukan cek-cek generik",
+          "Setelah dua kali follow-up tidak dibalas, ganti channel (telepon, bukan chat)",
+          "Atur waktu kunjungan/follow-up di jam sepi mereka, bukan jam sibuk"
+        ]
+      }
+    },
+    {
+      id: 13,
+      situation: {
+        en: "Customer says 'send me a proposal and I'll get back to you' instead of deciding now",
+        id: "Customer bilang 'kirim proposal aja, nanti saya kabari' padahal belum memutuskan"
+      },
+      response: {
+        en: "This is often a polite way to end the conversation, not a real next step — so before you agree to send anything, ask what's actually holding them back: price, timing, or needing someone else's approval? If it's approval from an owner/manager, ask if you can present together or send something they can forward directly. Only send a written proposal once you know the real objection — otherwise it disappears into an inbox with no urgency behind it.",
+        id: "Ini sering menjadi cara sopan untuk mengakhiri percakapan, bukan langkah nyata berikutnya — jadi sebelum setuju mengirim apa pun, tanyakan apa yang sebenarnya menahan mereka: harga, waktu, atau perlu persetujuan orang lain? Kalau itu persetujuan dari owner/manager, tanyakan apakah bisa presentasi bersama atau kirim sesuatu yang bisa langsung mereka teruskan. Kirim proposal tertulis hanya setelah tahu keberatan sebenarnya — kalau tidak, itu akan hilang di inbox tanpa urgensi."
+      },
+      keypoints: {
+        en: [
+          "'Send me a proposal' is often a polite exit, not a real next step — probe before agreeing",
+          "Ask directly: is it price, timing, or someone else's approval needed?",
+          "If approval is needed, offer to join that conversation or send something forwardable",
+          "Only send a written proposal once you know the real objection behind the stall"
+        ],
+        id: [
+          "'Kirim proposal aja' sering jadi cara sopan mengakhiri obrolan, bukan langkah nyata — gali dulu sebelum setuju",
+          "Tanyakan langsung: apakah soal harga, waktu, atau perlu persetujuan orang lain?",
+          "Kalau perlu persetujuan, tawarkan untuk ikut presentasi atau kirim sesuatu yang bisa diteruskan",
+          "Kirim proposal tertulis hanya setelah tahu keberatan sebenarnya di balik penundaan"
+        ]
+      }
+    },
+    {
+      id: 14,
+      situation: {
+        en: "Customer says they have no room to try anything new right now — menu/supplier list is already full",
+        id: "Customer bilang tidak ada ruang untuk coba hal baru sekarang — menu/daftar supplier sudah penuh"
+      },
+      response: {
+        en: "Don't ask them to make room for a whole new product — ask what's currently underperforming on their menu or in their current supplier lineup. Most kitchens have at least one item or supplier they're not fully happy with; positioning your product as a replacement for that specific pain point is a much smaller ask than 'try something extra.' If they can't name one, ask to check back in a slower season instead of pushing now.",
+        id: "Jangan minta mereka membuat ruang untuk produk baru sepenuhnya — tanyakan apa yang saat ini kurang optimal di menu atau daftar supplier mereka. Kebanyakan dapur punya setidaknya satu item atau supplier yang belum sepenuhnya memuaskan; posisikan produk Anda sebagai pengganti untuk titik masalah spesifik itu, ini permintaan yang jauh lebih kecil daripada 'coba tambahan.' Kalau mereka tidak bisa menyebutkan satu pun, minta untuk follow-up lagi di musim yang lebih sepi daripada memaksa sekarang."
+      },
+      keypoints: {
+        en: [
+          "Don't ask for 'extra room' — ask what's currently underperforming instead",
+          "Position as a replacement for a specific pain point, not an addition to an already-full list",
+          "If they can't name a weak spot, it's a genuine timing issue — schedule a follow-up, don't push",
+          "This turns a hard 'no' into a smaller, more specific ask"
+        ],
+        id: [
+          "Jangan minta 'ruang tambahan' — tanyakan apa yang sedang kurang optimal",
+          "Posisikan sebagai pengganti untuk titik masalah spesifik, bukan tambahan ke daftar yang sudah penuh",
+          "Kalau mereka tidak bisa sebutkan titik lemah, ini masalah timing asli — jadwalkan follow-up, jangan paksa",
+          "Ini mengubah penolakan besar menjadi permintaan yang lebih kecil dan spesifik"
+        ]
+      }
+    },
+    {
+      id: 15,
+      situation: {
+        en: "Walking into a cold visit with a brand-new prospect who doesn't know you or the company",
+        id: "Masuk ke kunjungan cold ke prospek baru yang belum kenal Anda atau perusahaan"
+      },
+      response: {
+        en: "Don't open with a product pitch — open with a short, specific reason you're there ('I work with [nearby customer they'd recognise] and wanted to introduce myself'). Ask about their current setup before offering anything: what they serve, who they buy from now, what's working and what isn't. The first visit's job is to get a second visit, not to close — leave one relevant catalog item or sample and a clear reason to come back (a price, a sample result, an answer you owe them).",
+        id: "Jangan buka dengan pitch produk — buka dengan alasan singkat dan spesifik kenapa Anda datang ('Saya kerja sama dengan [customer terdekat yang mereka kenal] dan ingin memperkenalkan diri'). Tanyakan dulu tentang setup mereka sekarang sebelum menawarkan apa pun: apa yang mereka sajikan, sekarang beli dari siapa, apa yang sudah berjalan baik dan yang belum. Tugas kunjungan pertama adalah mendapatkan kunjungan kedua, bukan closing — tinggalkan satu item katalog yang relevan atau sample dan alasan jelas untuk kembali (harga, hasil sample, jawaban yang masih Anda hutang ke mereka)."
+      },
+      keypoints: {
+        en: [
+          "Open with a specific, credible reason for being there — not a product pitch",
+          "Ask about their current setup before offering anything — listen first",
+          "The first visit's goal is a second visit, not a close",
+          "Always leave with a concrete reason to come back (a price to confirm, a sample to follow up on)"
+        ],
+        id: [
+          "Buka dengan alasan spesifik dan kredibel kenapa Anda ada di sana — bukan pitch produk",
+          "Tanyakan setup mereka sekarang sebelum menawarkan apa pun — dengarkan dulu",
+          "Tujuan kunjungan pertama adalah kunjungan kedua, bukan closing",
+          "Selalu tinggalkan dengan alasan konkret untuk kembali (harga yang perlu dikonfirmasi, sample untuk di-follow-up)"
         ]
       }
     }
