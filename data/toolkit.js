@@ -267,6 +267,28 @@ var TOOLKIT = {
         en: "Butter Sheets 10kg — Pre-cut lactic unsalted butter sheets, 82% fat, melt point 32–34°C. Designed for laminated pastry (croissants, danishes, puff pastry). Key advantage: use directly from chiller, no tempering needed. Best for: bakery, hotel pastry kitchen.\n\nButter Block 25kg — Lactic unsalted butter in 25kg rectangular block, 82% fat, wrapped in HDPE film. Best for: high-volume kitchen, industrial bakery, operations that process butter in bulk.\n\nClarified Butter 9.5kg — Butter with water and milk solids removed, concentrated pure butterfat. Higher smoke point — ideal for frying, roasting, barbecue, microwave cooking. Price is higher than regular butter but zero residue means zero wastage. Best for: restaurant kitchen, hotel cooking line.",
         id: "Butter Sheets 10kg — Lembaran butter laktis unsalted yang sudah dipotong, lemak 82%, titik leleh 32–34°C. Dirancang untuk pastry berlapis (croissant, danish, puff pastry). Keunggulan utama: langsung digunakan dari chiller, tidak perlu tempering. Terbaik untuk: bakery, dapur pastry hotel.\n\nButter Block 25kg — Butter laktis unsalted dalam blok persegi panjang 25kg, lemak 82%, dibungkus film HDPE. Terbaik untuk: dapur volume tinggi, bakery industri, operasi yang memproses butter dalam jumlah besar.\n\nClarified Butter 9.5kg — Butter dengan air dan padatan susu dihilangkan, lemak butter murni yang terkonsentrasi. Titik asap lebih tinggi — ideal untuk menggoreng, memanggang, barbecue, memasak microwave. Harga lebih tinggi dari butter biasa tapi zero residu berarti zero pemborosan. Terbaik untuk: dapur restoran, lini memasak hotel."
       }
+    },
+    {
+      id: 13,
+      question: {
+        en: "Are all Emborg products from Denmark?",
+        id: "Apakah semua produk Emborg dari Denmark?"
+      },
+      answer: {
+        en: "No. Emborg is a Danish company, but it sources each product from wherever in the world makes it best — the 16 Emborg SKUs we carry come from 7 different countries: Denmark (Camembert, Brie, Cooking Cream, Whipping Cream 200ml), Germany (both Cream Cheese SKUs), Italy (both Perfect Pasta SKUs), Poland (Pizza Topping Mozzarella), Belgium (all butter 100–200g plus Cook & Bake), Argentina (bulk 25kg butter), and New Zealand (Whipping Cream 1L). Check the Emborg module or the pricelist's origin column before telling a customer where a specific product is from.",
+        id: "Tidak. Emborg adalah perusahaan Denmark, tapi mengambil setiap produk dari tempat terbaik di dunia untuk produk itu — 16 SKU Emborg yang kita jual berasal dari 7 negara berbeda: Denmark (Camembert, Brie, Cooking Cream, Whipping Cream 200ml), Jerman (kedua SKU Cream Cheese), Italia (kedua SKU Perfect Pasta), Polandia (Pizza Topping Mozzarella), Belgia (semua butter 100–200g plus Cook & Bake), Argentina (butter bulk 25kg), dan Selandia Baru (Whipping Cream 1L). Cek modul Emborg atau kolom asal di pricelist sebelum memberi tahu customer asal produk tertentu."
+      }
+    },
+    {
+      id: 14,
+      question: {
+        en: "What's the difference between Parrot Gold and regular Parrot compound chocolate, and what is Nuri?",
+        id: "Apa bedanya Parrot Gold dan Parrot compound biasa, dan apa itu Nuri?"
+      },
+      answer: {
+        en: "Parrot Gold is the premium tier — available in Dark, Milk, and White. Regular Parrot compound is the value tier — Dark only. Both are compound chocolate (vegetable-fat based, no tempering needed) in the same pack sizes, so the choice usually comes down to whether the customer needs Milk/White options and premium positioning (Gold) or just wants the cheapest Dark option (Standard). Nuri is a separate but related brand — made by the same manufacturer (MAPN) as Parrot — used for the smaller-pack chocolate butiran (Butir Nuri Polos 1kg) as a value alternative to Butir Parrot.",
+        id: "Parrot Gold adalah tingkat premium — tersedia Dark, Milk, dan White. Parrot compound biasa adalah tingkat value — hanya Dark. Keduanya sama-sama compound chocolate (berbasis lemak nabati, tidak perlu tempering) dengan ukuran kemasan yang sama, jadi pilihannya biasanya tergantung apakah customer butuh pilihan Milk/White dan positioning premium (Gold) atau hanya ingin opsi Dark termurah (Standard). Nuri adalah merek terpisah tapi terkait — dibuat oleh produsen yang sama (MAPN) dengan Parrot — dipakai untuk butiran cokelat kemasan lebih kecil (Butir Nuri Polos 1kg) sebagai alternatif value dari Butir Parrot."
+      }
     }
   ],
 
@@ -925,6 +947,136 @@ var TOOLKIT = {
           content: {
             en: "Premium Bakery / Croissant Specialist → Lead with Butter Sheets. Ask about tempering. Offer one carton trial.\n\nHotel Pastry Kitchen → Lead with Sheets for laminated pastry, Block for bulk cooking. Emphasise consistency and NZ provenance.\n\nRestaurant Cooking Line → Lead with Clarified Butter. Position on smoke point and zero wastage.\n\nCasual Bakery / HORECA → Lead with the grass-fed story and yellow colour as a quality differentiator. Use the croissant testimonial.",
             id: "Bakery Premium / Spesialis Croissant → Mulai dengan Butter Sheets. Tanyakan tentang tempering. Tawarkan trial satu karton.\n\nDapur Pastry Hotel → Mulai dengan Sheets untuk pastry berlapis, Block untuk memasak dalam jumlah besar. Tekankan konsistensi dan asal NZ.\n\nLini Memasak Restoran → Mulai dengan Clarified Butter. Posisikan pada titik asap dan zero pemborosan.\n\nBakery Casual / HORECA → Mulai dengan cerita grass-fed dan warna kuning sebagai pembeda kualitas. Gunakan testimoni croissant."
+          }
+        }
+      ]
+    },
+    {
+      id: 9,
+      title: { en: "Emborg — European Dairy Range", id: "Emborg — Rangkaian Dairy Eropa" },
+      division: "MKS",
+      color: "#7A2450",
+      icon: "cheese",
+      sections: [
+        {
+          heading: { en: "What is Emborg?", id: "Apa itu Emborg?" },
+          content: {
+            en: "Emborg (Uhrenholt, est. 1947) is a European dairy brand — but \"European\" does not mean \"Danish.\" Emborg sources each product from wherever in Europe (and beyond) makes that specific product best, then brings it together under one brand. This means the range spans Denmark, Germany, Italy, Poland, Belgium, Argentina, and New Zealand — 7 different countries across just 16 SKUs. Getting a customer's product origin wrong is an easy, avoidable mistake — use this module to check before you speak, not after.",
+            id: "Emborg (Uhrenholt, berdiri sejak 1947) adalah merek dairy Eropa — tapi \"Eropa\" bukan berarti \"Denmark.\" Emborg mengambil setiap produk dari negara di Eropa (dan luar Eropa) yang paling unggul untuk produk spesifik itu, lalu menyatukannya dalam satu merek. Artinya rangkaian produknya mencakup Denmark, Jerman, Italia, Polandia, Belgia, Argentina, dan Selandia Baru — 7 negara berbeda hanya dalam 16 SKU. Salah menyebut asal produk ke customer adalah kesalahan yang mudah terjadi tapi mudah dihindari — cek dulu di modul ini sebelum bicara, jangan sesudahnya."
+          }
+        },
+        {
+          heading: { en: "Denmark — Camembert, Brie, Cream & Cooking Cream", id: "Denmark — Camembert, Brie, Whipping & Cooking Cream" },
+          content: {
+            en: "• Camembert 125g — soft white-mould cheese, 12/carton, shelf life 365 days, Halal\n• Brie 125g — soft white-mould cheese, 12/carton, shelf life 365 days, Halal\n• Cooking Cream 200ml — 27/carton, shelf life 360 days, Halal\n• Whipping Cream 200ml — 27/carton, shelf life 360 days, Halal\n\nThese four are the true \"home country\" line — safe to call these specifically Danish.",
+            id: "• Camembert 125g — keju lunak soft white-mould, 12/karton, shelf life 365 hari, Halal\n• Brie 125g — keju lunak soft white-mould, 12/karton, shelf life 365 hari, Halal\n• Cooking Cream 200ml — 27/karton, shelf life 360 hari, Halal\n• Whipping Cream 200ml — 27/karton, shelf life 360 hari, Halal\n\nEmpat produk ini adalah lini \"negara asal\" yang sebenarnya — aman disebut sebagai produk Denmark secara spesifik."
+          }
+        },
+        {
+          heading: { en: "Germany — Cream Cheese", id: "Jerman — Cream Cheese" },
+          content: {
+            en: "• Cream Cheese 200g — 12/carton, shelf life 365 days, Halal\n• Cream Cheese 1.5kg (\"European Cream Cheese\" on our pricelist) — 2 x 1.5kg/carton, shelf life 365 days, Halal, NEW\n\nBoth cream cheese SKUs are German, not Danish — this is the single most common mix-up since \"European Cream Cheese\" sounds Denmark-adjacent on the pricelist name.",
+            id: "• Cream Cheese 200g — 12/karton, shelf life 365 hari, Halal\n• Cream Cheese 1,5kg (tertulis \"European Cream Cheese\" di pricelist kita) — 2 x 1,5kg/karton, shelf life 365 hari, Halal, NEW\n\nKedua SKU cream cheese ini asalnya Jerman, bukan Denmark — ini kesalahan paling umum karena nama \"European Cream Cheese\" di pricelist terdengar seperti dari Denmark."
+          }
+        },
+        {
+          heading: { en: "Italy — Perfect Pasta (Cooking Cream)", id: "Italia — Perfect Pasta (Cooking Cream)" },
+          content: {
+            en: "• Perfect Pasta 200ml — 24/carton, shelf life 365 days, Halal\n• Perfect Pasta 1L (\"Perfect Pasta Cooking Cream 1L\" on our pricelist) — 10 x 1L/carton, shelf life 365 days, Halal\n\nDespite the pricelist name pairing it with \"Cooking Cream,\" this is a distinct Italian product line from the Danish Cooking Cream 200ml — don't conflate the two when talking to a customer.",
+            id: "• Perfect Pasta 200ml — 24/karton, shelf life 365 hari, Halal\n• Perfect Pasta 1L (tertulis \"Perfect Pasta Cooking Cream 1L\" di pricelist kita) — 10 x 1L/karton, shelf life 365 hari, Halal\n\nMeski nama di pricelist menggandengkannya dengan \"Cooking Cream,\" ini adalah lini produk Italia yang berbeda dari Cooking Cream 200ml asal Denmark — jangan disamakan saat bicara ke customer."
+          }
+        },
+        {
+          heading: { en: "Poland — Pizza Topping Mozzarella", id: "Polandia — Pizza Topping Mozzarella" },
+          content: {
+            en: "• Pizza Topping Mozzarella 2.3kg — 4/carton, shelf life 540 days, Halal\n\nThe only Emborg SKU sourced from Poland. Same shredded pizza-mozzarella category as Berggold (see the Berggold module) — if a customer already knows Berggold, use it as the reference point.",
+            id: "• Pizza Topping Mozzarella 2,3kg — 4/karton, shelf life 540 hari, Halal\n\nSatu-satunya SKU Emborg yang berasal dari Polandia. Kategori sama dengan pizza-mozzarella parut Berggold (lihat modul Berggold) — kalau customer sudah kenal Berggold, gunakan itu sebagai titik acuan."
+          }
+        },
+        {
+          heading: { en: "Belgium — Butter & Cook and Bake", id: "Belgia — Butter & Cook and Bake" },
+          content: {
+            en: "• Butter, unsalted 100g — 40/carton, shelf life 540 days, Halal\n• Butter, unsalted 200g — 20/carton, shelf life 540 days, Halal\n• Butter, salted 200g — 20/carton, shelf life 540 days, Halal\n• Cook & Bake, unsalted 200g — 20/carton, shelf life 540 days, Halal, NEW\n\nThe biggest SKU count of any single Emborg origin — 4 products. All small-format retail-style packs, not bulk.",
+            id: "• Butter, unsalted 100g — 40/karton, shelf life 540 hari, Halal\n• Butter, unsalted 200g — 20/karton, shelf life 540 hari, Halal\n• Butter, salted 200g — 20/karton, shelf life 540 hari, Halal\n• Cook & Bake, unsalted 200g — 20/karton, shelf life 540 hari, Halal, NEW\n\nJumlah SKU terbanyak dari satu negara asal Emborg — 4 produk. Semuanya kemasan kecil bergaya retail, bukan bulk."
+          }
+        },
+        {
+          heading: { en: "Argentina — Bulk 25kg Butter", id: "Argentina — Butter Bulk 25kg" },
+          content: {
+            en: "• Lactic Butter, unsalted 25kg — 1/carton (bulk box), shelf life 730 days\n• Butter, unsalted 25kg — 1/carton (bulk box), shelf life 730 days, Halal, NEW\n\nBoth are large-format bulk butter for high-volume kitchens/bakeries — the longest shelf life in the whole range (2 years), which is itself a strong pitch point for a customer worried about wastage on bulk stock.",
+            id: "• Lactic Butter, unsalted 25kg — 1/karton (bulk box), shelf life 730 hari\n• Butter, unsalted 25kg — 1/karton (bulk box), shelf life 730 hari, Halal, NEW\n\nKeduanya butter format besar untuk dapur/bakery volume tinggi — shelf life terpanjang di seluruh rangkaian (2 tahun), ini sendiri adalah poin jual kuat untuk customer yang khawatir soal pemborosan stok bulk."
+          }
+        },
+        {
+          heading: { en: "New Zealand — Whipping Cream 1L", id: "Selandia Baru — Whipping Cream 1L" },
+          content: {
+            en: "• Whipping Cream 1L — 12/carton, shelf life 365 days, Halal, NEW\n\nThe only Emborg SKU from New Zealand — same grass-fed dairy region as Canary Butter (see the Canary module), useful if a customer already trusts NZ dairy provenance.",
+            id: "• Whipping Cream 1L — 12/karton, shelf life 365 hari, Halal, NEW\n\nSatu-satunya SKU Emborg dari Selandia Baru — daerah dairy grass-fed yang sama dengan Canary Butter (lihat modul Canary) — berguna kalau customer sudah percaya dengan asal dairy NZ."
+          }
+        },
+        {
+          heading: { en: "Quick Answer for Customers", id: "Jawaban Cepat untuk Customer" },
+          content: {
+            en: "If a customer asks \"is this all Danish?\" — the honest, confident answer is: \"Emborg is a Danish company, but each product is sourced from wherever in the world makes it best — this specific one is from [check the region above]. That's not a downside, it's why the range is consistently high quality across cheese, butter, and cream.\" Never guess the origin on the spot — check this module or the pricelist first.",
+            id: "Kalau customer bertanya \"ini semua dari Denmark?\" — jawaban jujur dan percaya diri: \"Emborg adalah perusahaan Denmark, tapi setiap produk diambil dari tempat terbaik di dunia untuk produk itu — yang ini spesifiknya dari [cek region di atas]. Ini bukan kekurangan, justru itulah alasan rangkaian produknya konsisten berkualitas tinggi mulai dari keju, butter, sampai cream.\" Jangan pernah menebak asal produk di tempat — cek modul ini atau pricelist dulu."
+          }
+        }
+      ]
+    },
+    {
+      id: 10,
+      title: { en: "Parrot — Compound Chocolate & Cocoa Range", id: "Parrot — Rangkaian Compound Cokelat & Cocoa" },
+      division: "MKS",
+      color: "#5C3A21",
+      icon: "cheese",
+      sections: [
+        {
+          heading: { en: "What is Parrot?", id: "Apa itu Parrot?" },
+          content: {
+            en: "Parrot is an Indonesian compound chocolate and cocoa brand made by PT Multi Aneka Pangan Nusantara (MAPN) in Gresik, East Java — Halal certified, BPOM registered. \"Compound\" chocolate uses vegetable fat instead of pure cocoa butter, which means it does not need tempering — a rep-friendly product, since a customer can melt and use it directly without special equipment, unlike couverture chocolate. Parrot covers 7 product types: compound bars (Gold and Standard tiers), chocolate butiran (chips/rice), cocoa powder, chocolate paste, chocolate drink, and a crunchy spread.",
+            id: "Parrot adalah merek compound cokelat dan cocoa asal Indonesia yang dibuat oleh PT Multi Aneka Pangan Nusantara (MAPN) di Gresik, Jawa Timur — bersertifikat Halal, terdaftar BPOM. Cokelat \"compound\" menggunakan lemak nabati, bukan cocoa butter murni, artinya tidak perlu tempering — produk yang mudah dijelaskan ke customer, karena bisa langsung dilelehkan dan dipakai tanpa alat khusus, berbeda dengan cokelat couverture. Parrot mencakup 7 jenis produk: compound bar (tingkat Gold dan Standard), butiran cokelat (chip/meses), cocoa powder, chocolate paste, chocolate drink, dan crunchy spread."
+          }
+        },
+        {
+          heading: { en: "Compound Bars — Gold vs Standard", id: "Compound Bar — Gold vs Standard" },
+          content: {
+            en: "Parrot Gold (premium tier) — comes in Dark, Milk, and White. Pack: 1kg x12/carton, 250g x24/carton, 5kg x4/carton. Pricelist SKUs: Compound Parrot Gold 1Kg, Compound Parrot Gold 250gr.\n\nParrot Standard (value tier) — Dark only. Pack: 1kg x12/carton, 500g x24/carton, 250g x48/carton, 5kg x4/carton. Pricelist SKUs: Compound Parrot 1Kg, Compound Parrot 250gr.\n\nBoth: for decoration, coating, topping, filling, praline, ganache. Lead with Gold for a customer who cares about flavour range (Milk/White options) or premium positioning; lead with Standard for a customer who's price-sensitive and only needs Dark.",
+            id: "Parrot Gold (tingkat premium) — tersedia Dark, Milk, dan White. Kemasan: 1kg x12/karton, 250g x24/karton, 5kg x4/karton. SKU Pricelist: Compound Parrot Gold 1Kg, Compound Parrot Gold 250gr.\n\nParrot Standard (tingkat value) — hanya Dark. Kemasan: 1kg x12/karton, 500g x24/karton, 250g x48/karton, 5kg x4/karton. SKU Pricelist: Compound Parrot 1Kg, Compound Parrot 250gr.\n\nKeduanya: untuk dekorasi, coating, topping, filling, praline, ganache. Tawarkan Gold untuk customer yang peduli pilihan rasa (ada Milk/White) atau positioning premium; tawarkan Standard untuk customer yang sensitif harga dan hanya butuh Dark."
+          }
+        },
+        {
+          heading: { en: "Chocolate Butiran (Chips / Rice)", id: "Butiran Cokelat (Chip / Meses)" },
+          content: {
+            en: "• Butir Parrot Gold Polos 12kg — dark chocolate-coloured chips, strong chocolate flavour/aroma. Flavour leans high cocoa, high bitter, low creamy.\n• Butir Parrot Polos Red 12kg — same Parrot butiran family, red/colour variant.\n• Butir Nuri Polos 1kg — smaller pack size, same category, from Nuri — a companion brand made by the same manufacturer (MAPN) as a value-tier alternative to Parrot. (\"Nuri\" is Indonesian for parrot/lorikeet — same house, different label.)\n\nAll for decoration, topping, filling — this is the sprinkle/meses format, not a bar.",
+            id: "• Butir Parrot Gold Polos 12kg — chip cokelat kehitaman, rasa/aroma cokelat kuat. Rasa condong cocoa tinggi, bitter tinggi, creamy rendah.\n• Butir Parrot Polos Red 12kg — masih keluarga butiran Parrot, varian merah/warna.\n• Butir Nuri Polos 1kg — kemasan lebih kecil, kategori sama, dari Nuri — merek pendamping buatan produsen yang sama (MAPN) sebagai alternatif tingkat value dari Parrot. (\"Nuri\" adalah nama burung — satu pabrik, label berbeda.)\n\nSemua untuk dekorasi, topping, filling — ini format taburan/meses, bukan batangan."
+          }
+        },
+        {
+          heading: { en: "Cocoa Powder — High Fat", id: "Cocoa Powder — High Fat" },
+          content: {
+            en: "Parrot High Fat Powder 1kg — Dark Brown, Hi-Fat cocoa powder, fat content 22–24%, pH 7.4–8.0, pack 1kg x6. Gives an intense chocolate flavour. Applications: filling, bakery, ice cream, pudding, decoration. (The catalog also lists a lower-fat 10–12% Dark Brown and a Black variant, both with distinct bitterness/acidity profiles — not currently in our Pricelist, so don't quote them, but worth knowing they exist if a customer specifically asks for a lighter-fat or black cocoa powder.)",
+            id: "Parrot High Fat Powder 1kg — Dark Brown, cocoa powder Hi-Fat, kadar lemak 22–24%, pH 7,4–8,0, kemasan 1kg x6. Memberikan rasa cokelat yang intens. Aplikasi: filling, bakery, ice cream, pudding, dekorasi. (Katalog juga mencantumkan varian Dark Brown lemak lebih rendah 10–12% dan varian Black, keduanya dengan profil bitterness/acidity berbeda — belum ada di Pricelist kita, jadi jangan tawarkan harga, tapi baik untuk diketahui kalau ada customer yang khusus minta cocoa powder lemak lebih rendah atau warna hitam.)"
+          }
+        },
+        {
+          heading: { en: "Chocolate Paste & Choco Crunchy Spread", id: "Chocolate Paste & Choco Crunchy Spread" },
+          content: {
+            en: "Pasta Parrot (Chocolate Paste) 1kg/5kg — soft-texture chocolate paste, for filling, cookies, topping.\n\nPasta Choko Crunchy 1kg — a newer item in the range (marked NEW in the source catalog), a crunchy chocolate spread under the sister \"Choko\" label, for topping and filling — a good upsell alongside the plain Chocolate Paste when a customer wants texture, not just flavour.",
+            id: "Pasta Parrot (Chocolate Paste) 1kg/5kg — chocolate paste bertekstur lembut, untuk filling, cookies, topping.\n\nPasta Choko Crunchy 1kg — item lebih baru dalam rangkaian (ditandai NEW di katalog sumber), chocolate spread bertekstur crunchy di bawah label saudara \"Choko\" — untuk topping dan filling, upsell yang baik selain Chocolate Paste polos kalau customer ingin tekstur, bukan cuma rasa."
+          }
+        },
+        {
+          heading: { en: "Chocolate Drink", id: "Chocolate Drink" },
+          content: {
+            en: "Parrot Chocolate Drink 500g — a mix of sugar, milk, and cocoa powder, pack 500g x20. Can be served hot or cold — useful for a café/restaurant menu, not just a bakery ingredient.",
+            id: "Parrot Chocolate Drink 500g — campuran gula, susu, dan cocoa powder, kemasan 500g x20. Bisa disajikan panas atau dingin — berguna untuk menu café/restoran, bukan cuma bahan bakery."
+          }
+        },
+        {
+          heading: { en: "Quick Product Matcher", id: "Pencocok Produk Cepat" },
+          content: {
+            en: "Customer needs a tempering-free coating/moulding chocolate → Compound Bar (Gold for premium, Standard for value)\nCustomer wants filling for pastries/cookies → Chocolate Paste, or High Fat Cocoa Powder\nCustomer wants a sprinkle/topping/decoration → Butiran (Butir Parrot Gold, Butir Nuri)\nCustomer wants a menu chocolate beverage → Chocolate Drink\nCustomer wants a spread for toast/dessert → Choco Crunchy Spread",
+            id: "Customer butuh cokelat coating/moulding tanpa tempering → Compound Bar (Gold untuk premium, Standard untuk value)\nCustomer butuh filling untuk pastry/cookies → Chocolate Paste, atau High Fat Cocoa Powder\nCustomer butuh taburan/topping/dekorasi → Butiran (Butir Parrot Gold, Butir Nuri)\nCustomer butuh minuman cokelat untuk menu → Chocolate Drink\nCustomer butuh spread untuk roti/dessert → Choco Crunchy Spread"
           }
         }
       ]
