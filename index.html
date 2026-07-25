@@ -811,6 +811,47 @@ _loadScript(
   </div>
 </div>
 
+<!-- EDIT REP PROFILE (Super Admin) -->
+<div class="overlay hidden" id="edit-rep-overlay" onclick="closeEditRepProfile(event)">
+  <div class="prod-modal" id="edit-rep-modal">
+    <div class="pm-handle"></div>
+    <div class="pm-name" id="edit-rep-title">Edit Profile</div>
+    <div class="pm-details" style="grid-template-columns:1fr">
+      <div class="pm-det full">
+        <div class="pm-det-label">Phone</div>
+        <input class="order-cust-inp" id="edit-rep-phone" placeholder="Optional" autocomplete="off">
+      </div>
+      <div class="pm-det full">
+        <div class="pm-det-label">Role</div>
+        <select class="order-cust-inp" id="edit-rep-role">
+          <option value="none">Regular rep / no special role</option>
+          <option value="manager">Manager</option>
+          <option value="bisdev_food">Bisdev — Food</option>
+          <option value="bisdev_beverage">Bisdev — Beverage</option>
+          <option value="nestle_coordinator">Nestle Coordinator</option>
+          <option value="super_admin">Super Admin</option>
+        </select>
+      </div>
+      <div class="pm-det full">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="edit-rep-active" style="width:16px;height:16px">
+          <span class="pm-det-label" style="margin:0">Active (can log in)</span>
+        </label>
+      </div>
+      <div class="pm-det full" style="font-size:.68rem;color:var(--txt3);line-height:1.4">
+        To reset a forgotten PIN: Supabase Studio → Authentication → Users → find <b id="edit-rep-email"></b> → reset password. Can't be done from here for security reasons.
+      </div>
+    </div>
+    <div class="intel-form-error" id="edit-rep-error">&nbsp;</div>
+    <div class="pm-actions">
+      <button class="pm-btn-close" onclick="closeEditRepProfile()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <button class="pm-btn-add" style="flex:1" onclick="submitEditRepProfile()">Save</button>
+    </div>
+  </div>
+</div>
+
 <!-- BISDEV DASHBOARD (Food or Beverage company-wide overview) -->
 <div class="overlay hidden" id="bisdev-overlay" onclick="closeBisdevDashboard(event)">
   <div class="prod-modal" id="bisdev-modal">
