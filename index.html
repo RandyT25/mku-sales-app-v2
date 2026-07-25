@@ -61,6 +61,11 @@
     </div>
   </header>
 
+  <div class="view-as-banner hidden" id="view-as-banner">
+    Viewing as <b id="view-as-name"></b>
+    <button onclick="exitViewAs()">Exit</button>
+  </div>
+
   <div class="screens" id="screens">
 
     <div class="screen active" id="screen-today">
@@ -636,7 +641,9 @@ function _bootAuth() {
     if (repRow) {
       const idx = REP_CONFIG.findIndex(r => r.name === repRow.name);
       if (idx !== -1) {
-        selectRep(idx, { repId: repRow.id, authUserId: repRow.auth_user_id, isManager: repRow.is_manager, phone: repRow.phone, photoUrl: repRow.photo_url });
+        const authInfo = { repId: repRow.id, authUserId: repRow.auth_user_id, isManager: repRow.is_manager, phone: repRow.phone, photoUrl: repRow.photo_url, bisdevCategory: repRow.bisdev_category, isNestleCoordinator: repRow.is_nestle_coordinator, isSuperAdmin: repRow.is_super_admin };
+        if (repRow.is_super_admin) { _superAdminOwnIdx = idx; _superAdminOwnAuthInfo = authInfo; }
+        selectRep(idx, authInfo);
       }
     }
   }).catch(e => { console.error('restoreSession error:', e); _showLogin(); });

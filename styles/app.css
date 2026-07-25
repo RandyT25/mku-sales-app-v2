@@ -707,6 +707,17 @@ input { font-family: var(--sans); }
 .profile-photo-row { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 6px 20px 18px; }
 .profile-upload-btn { font-size: .78rem; font-weight: 700; color: var(--red); cursor: pointer; }
 
+/* ── VIEW AS BANNER (Super Admin) ── */
+.view-as-banner {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--gold); color: #1a1400; font-size: .75rem; font-weight: 700;
+  padding: 7px 12px; text-align: center;
+}
+.view-as-banner button {
+  border: none; background: rgba(0,0,0,0.15); color: inherit; font-weight: 700;
+  font-size: .7rem; padding: 3px 10px; border-radius: var(--r-sm);
+}
+
 /* ── INTEL PHOTO ── */
 .intel-photo-row { display: flex; align-items: center; gap: 12px; padding: 0 20px 12px; }
 .intel-photo-preview { width: 56px; height: 56px; border-radius: var(--r-sm); background: var(--bg); border: 1px solid var(--border); overflow: hidden; flex-shrink: 0; }
