@@ -17,4 +17,6 @@ export const PINS = {
   'Redi':           '000000',
   'Gek Mas':        '000000',
   'Manager':        '000000',
+  'Bisdev Food':      '000000',
+  'Bisdev Beverage':  '000000',
 };

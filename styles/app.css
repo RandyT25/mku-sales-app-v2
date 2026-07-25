@@ -706,6 +706,12 @@ input { font-family: var(--sans); }
 /* ── PROFILE ── */
 .profile-photo-row { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 6px 20px 18px; }
 .profile-upload-btn { font-size: .78rem; font-weight: 700; color: var(--red); cursor: pointer; }
+
+/* ── INTEL PHOTO ── */
+.intel-photo-row { display: flex; align-items: center; gap: 12px; padding: 0 20px 12px; }
+.intel-photo-preview { width: 56px; height: 56px; border-radius: var(--r-sm); background: var(--bg); border: 1px solid var(--border); overflow: hidden; flex-shrink: 0; }
+.intel-photo-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.intel-card-photo { width: 40px; height: 40px; border-radius: var(--r-sm); object-fit: cover; flex-shrink: 0; cursor: pointer; }
 .profile-changepin-btn {
   width: calc(100% - 40px); margin: 10px 20px 20px; padding: 12px;
   border-radius: var(--r-md); border: 1.5px solid var(--border); background: var(--surface);

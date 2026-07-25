@@ -269,6 +269,13 @@
   <div class="prod-modal" id="intel-form-modal">
     <div class="pm-handle"></div>
     <div class="pm-name" id="intel-form-title">Log Competitor Price</div>
+    <div class="intel-photo-row">
+      <div id="intel-photo-preview" class="intel-photo-preview"></div>
+      <label class="profile-upload-btn">
+        Add Photo
+        <input type="file" id="intel-photo-input" accept="image/*" style="display:none" onchange="onIntelPhotoSelected(this.files[0])">
+      </label>
+    </div>
     <div class="pm-details" style="grid-template-columns:1fr">
       <div class="pm-det full">
         <div class="pm-det-label">Competitor Name *</div>
@@ -793,6 +800,21 @@ _loadScript(
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
       </button>
       <button class="pm-btn-add" style="flex:1" onclick="submitSendAnnouncement()">Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- BISDEV DASHBOARD (Food or Beverage company-wide overview) -->
+<div class="overlay hidden" id="bisdev-overlay" onclick="closeBisdevDashboard(event)">
+  <div class="prod-modal" id="bisdev-modal">
+    <div class="pm-handle"></div>
+    <div class="pm-name" id="bisdev-title">Company Overview</div>
+    <div class="target-hero" id="bisdev-hero"></div>
+    <div class="target-body" id="bisdev-body"></div>
+    <div class="pm-actions">
+      <button class="pm-btn-close" style="width:100%" onclick="closeBisdevDashboard()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
     </div>
   </div>
 </div>

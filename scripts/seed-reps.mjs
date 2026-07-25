@@ -42,6 +42,8 @@ const REPS = [
   { name: 'Redi',           area: 'NP-2 (Nestlé)' },
   { name: 'Gek Mas',        area: 'NP-3 (Nestlé)' },
   { name: 'Manager',        area: 'Management', is_manager: true },
+  { name: 'Bisdev Food',      area: 'Company-wide (Food)',      bisdev_category: 'food' },
+  { name: 'Bisdev Beverage',  area: 'Company-wide (Beverage)',  bisdev_category: 'beverage' },
 ];
 
 const headers = {
@@ -76,7 +78,7 @@ async function createAuthUser(email, password, displayName) {
   return data.id ?? data.user?.id;
 }
 
-async function createRepRow({ name, login_alias, auth_user_id, is_nestle, is_manager }) {
+async function createRepRow({ name, login_alias, auth_user_id, is_nestle, is_manager, bisdev_category }) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/reps`, {
     method: 'POST',
     headers: { ...headers, Prefer: 'return=minimal' },
@@ -86,6 +88,7 @@ async function createRepRow({ name, login_alias, auth_user_id, is_nestle, is_man
       auth_user_id,
       is_nestle,
       is_manager: !!is_manager,
+      bisdev_category: bisdev_category || null,
       active: true,
     }),
   });
@@ -111,6 +114,7 @@ for (const rep of REPS) {
       auth_user_id: authUserId,
       is_nestle: rep.area.includes('Nestlé'),
       is_manager: rep.is_manager,
+      bisdev_category: rep.bisdev_category,
     });
     console.log(`✓ ${rep.name} (${alias})`);
   } catch (e) {
