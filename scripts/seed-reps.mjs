@@ -44,6 +44,7 @@ const REPS = [
   { name: 'Manager',        area: 'Management', is_manager: true },
   { name: 'Bisdev Food',      area: 'Company-wide (Food)',      bisdev_category: 'food' },
   { name: 'Bisdev Beverage',  area: 'Company-wide (Beverage)',  bisdev_category: 'beverage' },
+  { name: 'Nestle Coordinator', area: 'Nestle Team Overview',   is_nestle_coordinator: true },
 ];
 
 const headers = {
@@ -78,7 +79,7 @@ async function createAuthUser(email, password, displayName) {
   return data.id ?? data.user?.id;
 }
 
-async function createRepRow({ name, login_alias, auth_user_id, is_nestle, is_manager, bisdev_category }) {
+async function createRepRow({ name, login_alias, auth_user_id, is_nestle, is_manager, bisdev_category, is_nestle_coordinator }) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/reps`, {
     method: 'POST',
     headers: { ...headers, Prefer: 'return=minimal' },
@@ -89,6 +90,7 @@ async function createRepRow({ name, login_alias, auth_user_id, is_nestle, is_man
       is_nestle,
       is_manager: !!is_manager,
       bisdev_category: bisdev_category || null,
+      is_nestle_coordinator: !!is_nestle_coordinator,
       active: true,
     }),
   });
@@ -115,6 +117,7 @@ for (const rep of REPS) {
       is_nestle: rep.area.includes('Nestlé'),
       is_manager: rep.is_manager,
       bisdev_category: rep.bisdev_category,
+      is_nestle_coordinator: rep.is_nestle_coordinator,
     });
     console.log(`✓ ${rep.name} (${alias})`);
   } catch (e) {
