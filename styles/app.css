@@ -411,6 +411,7 @@ input { font-family: var(--sans); }
 .tc-so-qty { font-size: .63rem; color: var(--txt3); flex-shrink: 0; white-space: nowrap; }
 .tc-so-qty.low { color: var(--gold); font-weight: 600; }
 .tc-so-rev { font-family: var(--mono); font-size: .68rem; font-weight: 700; color: var(--red); flex-shrink: 0; }
+.tc-so-rev-est { color: var(--gold); font-weight: 600; opacity: 0.85; }
 
 /* ══════════════════════════════
    PRICELIST SCREEN
