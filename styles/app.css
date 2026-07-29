@@ -369,6 +369,7 @@ input { font-family: var(--sans); }
 }
 .ac-title { font-size: .8rem; font-weight: 700; color: var(--txt2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
 .ac-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.ac-row-loading { opacity: 0.5; pointer-events: none; }
 .ac-row:last-child { border-bottom: none; }
 .ac-rank { font-family: var(--mono); font-size: .72rem; color: var(--txt3); width: 18px; text-align: center; flex-shrink: 0; }
 .ac-name { flex: 1; font-size: .82rem; font-weight: 600; }
