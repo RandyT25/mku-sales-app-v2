@@ -3,3 +3,4 @@
 node_modules/
 *.log
 scripts/seed-reps.local.mjs
+supabase/.temp/
