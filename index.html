@@ -16,6 +16,7 @@
   <meta name="theme-color" content="#AD1F28">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <script type="module" src="lib/auth.js"></script>
+  <script type="module" src="lib/dashboard-data.js"></script>
   <script type="module" src="features/competitor-intel.js"></script>
   <script type="module" src="features/customer-identity.js"></script>
   <script type="module" src="features/customer-relations.js"></script>
@@ -617,7 +618,9 @@ function _showLogin() {
 }
 
 function _dataLoaded() {
-  console.log('RAW.latest=', RAW.latest, 'Juni pct=', (RAW.targets_by_date[RAW.latest]?.area_targets||[]).find(a=>a.sales==='Juni')?.pct);
+  if (typeof RAW !== 'undefined') {
+    console.log('RAW.latest=', RAW.latest, 'Juni pct=', (RAW.targets_by_date[RAW.latest]?.area_targets||[]).find(a=>a.sales==='Juni')?.pct);
+  }
   clearInterval(_barTimer);
   const b = document.getElementById('load-bar');
   if (b) b.style.width = '100%';
@@ -651,94 +654,75 @@ function _bootAuth() {
 
 // Re-fetch just the sales data feed in place (no page reload, no touching
 // login state) so a long-backgrounded app shows fresh numbers on resume
-// without disturbing the rep's session.
+// without disturbing the rep's session. Called only while a rep is already
+// actively using the app, so a valid session is guaranteed.
 function _refreshDataInPlace() {
-  _loadScript(
-    'https://randyt25.github.io/MKU-MKS-Area-Dashboard/data_sales.js?v=' + new Date().toISOString().slice(0,10),
-    function() {
-      if (window._currentRep && typeof renderTarget === 'function') {
-        try { renderTarget(); } catch (e) { console.error('renderTarget refresh error:', e); }
-      }
-    },
-    function() { console.warn('Background data refresh failed'); }
-  );
+  window.DashboardData.loadSales().then(function() {
+    if (window._currentRep && typeof renderTarget === 'function') {
+      try { renderTarget(); } catch (e) { console.error('renderTarget refresh error:', e); }
+    }
+  }).catch(function() { console.warn('Background data refresh failed'); });
 }
 
 function _dataFailed() {
+  clearInterval(_barTimer);
   const el = document.getElementById('load-msg');
-  if (el) { el.textContent = 'Loading full data…'; }
-  _loadScript(
-    'https://randyt25.github.io/MKU-MKS-Area-Dashboard/data.js',
-    _dataLoaded,
-    function() {
-      clearInterval(_barTimer);
-      const el = document.getElementById('load-msg');
-      if (el) { el.textContent = 'Failed to load — check connection'; el.style.color = '#F08080'; }
-    }
-  );
+  if (el) { el.textContent = 'Failed to load — check connection'; el.style.color = '#F08080'; }
 }
 
-// Always fetch from dashboard repo
-_loadScript(
-  'https://randyt25.github.io/MKU-MKS-Area-Dashboard/data_sales.js?v=' + new Date().toISOString().slice(0,10),
-  function() {
-    _dataLoaded();
-    _loadScript(
-      'https://randyt25.github.io/MKU-MKS-Area-Dashboard/customers.js?v=' + new Date().toISOString().slice(0,10),
-      function() { window._customersReady = true; if (window._custTabOpen) renderCustomers(); if (typeof window.refreshCustIfOpen === 'function') window.refreshCustIfOpen(); },
-      function() { window._customersReady = false; }
-    );
-    // Load FJ delivery Excel files via SheetJS
-    // Use GitHub API (not raw CDN) — CDN ignores cache-busting query params.
-    const _fjApiBase = 'https://api.github.com/repos/RandyT25/MKU-MKS-Area-Dashboard/contents/uploads/';
-    const _fjTodayDay = (new Date()).getDate();
-    async function _loadFJExcel(filename, varName) {
-      try {
-        const resp = await fetch(_fjApiBase + filename, {
-          cache: 'no-store',
-          headers: { 'Accept': 'application/vnd.github.raw' }
-        });
-        if (!resp.ok) throw new Error(resp.status);
-        const buf = await resp.arrayBuffer();
-        const wb = XLSX.read(new Uint8Array(buf), { type: 'array', cellDates: true });
-        const ws = wb.Sheets[wb.SheetNames[0]];
-        window[varName] = XLSX.utils.sheet_to_json(ws, { defval: '' });
-        window._fjNameMap = null;
-      } catch(e) { console.warn('FJ load failed:', varName, e.message); window[varName] = []; }
-    }
-    // Mirrors date-parsing + isFJStale logic in lib/app-core.js (getFJData/isFJStale).
-    // Duplicated (not shared) because app-core.js loads async in parallel with this
-    // code and may not be ready yet — keep in sync if that logic ever changes.
-    function _fjMaxDate(rows) {
-      let max = new Date(0);
-      for (const r of rows) {
-        const raw = r['Tgl. Kirim'];
-        const d = raw instanceof Date ? raw
-          : (typeof raw === 'number' ? new Date((raw - 25569) * 86400 * 1000)
-          : (typeof raw === 'string' && raw ? new Date(raw) : null));
-        if (d && !isNaN(d) && d > max) max = d;
-      }
-      return max;
-    }
-    function _fjIsStale(rows) {
-      if (!rows.length) return true;
-      const today = new Date(); today.setHours(0,0,0,0);
-      return _fjMaxDate(rows) < today;
-    }
-    // Try days +1, +2, +3, +4 — handles weekends/holidays where the next file
-    // might skip a day (e.g. no Sunday deliveries, so Monday file is uploaded instead).
-    // A candidate file is only accepted if its embedded dates are actually fresh —
-    // filenames recycle monthly (no month/year in the name), so a same-named file
-    // can still hold last month's stale data until the warehouse re-uploads it.
-    // Falls back to today's file if none of +1..+4 are fresh.
-    async function _loadFJDiv(prefix, varName) {
-      for (let i = 1; i <= 4; i++) {
-        const d = new Date(); d.setDate(d.getDate() + i);
-        await _loadFJExcel(prefix + '%20' + d.getDate() + '.xlsx', varName);
-        if ((window[varName] || []).length && !_fjIsStale(window[varName])) return;
-      }
-      await _loadFJExcel(prefix + '%20' + _fjTodayDay + '.xlsx', varName);
-    }
+// FJ delivery Excel files, sales data, and customer data all now route
+// through the auth-gated dashboard-proxy Edge Function (lib/dashboard-data.js)
+// instead of fetching the MKU-MKS-Area-Dashboard repo directly — that repo
+// held real customer/revenue/delivery data and was previously reachable by
+// anyone with the URL, completely bypassing the app's PIN login.
+const _fjTodayDay = (new Date()).getDate();
+
+async function _loadFJExcel(filename, varName) {
+  try {
+    const buf = await window.DashboardData.loadFJExcel(filename);
+    const wb = XLSX.read(new Uint8Array(buf), { type: 'array', cellDates: true });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    window[varName] = XLSX.utils.sheet_to_json(ws, { defval: '' });
+    window._fjNameMap = null;
+  } catch(e) { console.warn('FJ load failed:', varName, e.message || e); window[varName] = []; }
+}
+
+// Mirrors date-parsing + isFJStale logic in lib/app-core.js (getFJData/isFJStale).
+// Duplicated (not shared) because app-core.js loads async in parallel with this
+// code and may not be ready yet — keep in sync if that logic ever changes.
+function _fjMaxDate(rows) {
+  let max = new Date(0);
+  for (const r of rows) {
+    const raw = r['Tgl. Kirim'];
+    const d = raw instanceof Date ? raw
+      : (typeof raw === 'number' ? new Date((raw - 25569) * 86400 * 1000)
+      : (typeof raw === 'string' && raw ? new Date(raw) : null));
+    if (d && !isNaN(d) && d > max) max = d;
+  }
+  return max;
+}
+function _fjIsStale(rows) {
+  if (!rows.length) return true;
+  const today = new Date(); today.setHours(0,0,0,0);
+  return _fjMaxDate(rows) < today;
+}
+// Try days +1, +2, +3, +4 — handles weekends/holidays where the next file
+// might skip a day (e.g. no Sunday deliveries, so Monday file is uploaded instead).
+// A candidate file is only accepted if its embedded dates are actually fresh —
+// filenames recycle monthly (no month/year in the name), so a same-named file
+// can still hold last month's stale data until the warehouse re-uploads it.
+// Falls back to today's file if none of +1..+4 are fresh.
+async function _loadFJDiv(prefix, varName) {
+  for (let i = 1; i <= 4; i++) {
+    const d = new Date(); d.setDate(d.getDate() + i);
+    await _loadFJExcel(prefix + '%20' + d.getDate() + '.xlsx', varName);
+    if ((window[varName] || []).length && !_fjIsStale(window[varName])) return;
+  }
+  await _loadFJExcel(prefix + '%20' + _fjTodayDay + '.xlsx', varName);
+}
+
+function _loadFJAll() {
+  return new Promise(function(resolve) {
     _loadScript('https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js',
       function() {
         Promise.all([
@@ -750,13 +734,57 @@ _loadScript(
           if (window._currentRep && typeof renderTarget === 'function') {
             renderTarget();
           }
+          resolve();
         });
       },
-      function() { window.FJ_MKU = []; window.FJ_MKS = []; window.FJ_MKU_TODAY = []; window.FJ_MKS_TODAY = []; }
+      function() { window.FJ_MKU = []; window.FJ_MKS = []; window.FJ_MKU_TODAY = []; window.FJ_MKS_TODAY = []; resolve(); }
     );
-  },
-  _dataFailed
-);
+  });
+}
+
+// Sales data first (app boot proceeds as soon as this lands, matching the
+// old timing), customers + FJ deliveries load in parallel in the background —
+// same concurrency as before, just each routed through the proxy now.
+// Exposed globally so submitPin()/finishPinChange() (lib/app-core.js) can
+// call this after a fresh login when no session existed yet at boot time.
+async function _loadAllData() {
+  await window.DashboardData.loadSales();
+  window.DashboardData.loadCustomers().then(function() {
+    window._customersReady = true;
+    if (window._custTabOpen) renderCustomers();
+    if (typeof window.refreshCustIfOpen === 'function') window.refreshCustIfOpen();
+  }).catch(function() { window._customersReady = false; });
+  _loadFJAll();
+}
+window._loadAllData = _loadAllData;
+
+// ── STEP 3: Kick off boot ──
+// Data requires an authenticated session now, so the real, authoritative
+// restoreSession() (lib/auth.js — validates the session server-side AND
+// checks reps.active, signing out cleanly if either fails) decides whether
+// to fetch data immediately. Imported directly here (not via window.AppAuth)
+// since app-core.js — which _bootAuth() normally waits for via
+// waitForGlobal — hasn't loaded yet at this point in boot. _bootAuth() below
+// re-checks the session once app-core.js is ready; the extra round trip is
+// a minor, acceptable cost for reusing one single source of truth for
+// "is this session actually still valid" instead of a second, shallower check.
+Promise.all([
+  import('./lib/auth.js'),
+  import('./lib/dashboard-data.js'),
+]).then(function(mods) {
+  return mods[0].restoreSession();
+}).then(function(repRow) {
+  if (repRow) {
+    _loadAllData().then(_dataLoaded).catch(_dataFailed);
+  } else {
+    window._dataPending = true;
+    _dataLoaded();
+  }
+}).catch(function(e) {
+  console.error('boot session check failed:', e);
+  window._dataPending = true;
+  _dataLoaded();
+});
 </script>
 
 <!-- ANNOUNCEMENT PANEL -->
