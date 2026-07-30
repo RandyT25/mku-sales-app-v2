@@ -71,7 +71,10 @@ Deno.serve(async (req) => {
     let binary: boolean;
 
     if (type === 'jsfile' && JSFILE_ALLOWLIST.has(file)) {
-      ghPath = file;
+      // These files are served from the repo's GitHub Pages source dir, not
+      // repo root (confirmed via the Contents API: root has no .js files,
+      // docs/ has data_sales.js, data.js, customers.js).
+      ghPath = `docs/${file}`;
       binary = false;
     } else if (type === 'fj' && FJ_FILE_RE.test(file)) {
       ghPath = `uploads/${file}`;
