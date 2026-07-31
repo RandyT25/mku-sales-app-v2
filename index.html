@@ -706,6 +706,23 @@ function _fjIsStale(rows) {
   const today = new Date(); today.setHours(0,0,0,0);
   return _fjMaxDate(rows) < today;
 }
+// Which files actually exist in uploads/ right now — fetched once per boot
+// and shared between the MKU/MKS calls below, so we don't blindly request
+// (and fail, loudly logged by the browser regardless of try/catch) dates
+// that haven't been uploaded yet. Falls back to null ("unknown") if the
+// listing itself fails, in which case _loadFJDiv below degrades to the old
+// try-every-date behavior — a safety net, not a new failure mode.
+let _fjListPromise = null;
+function _fjFileList() {
+  if (!_fjListPromise) {
+    _fjListPromise = window.DashboardData.listFJFiles().catch(function(e) {
+      console.warn('FJ file list failed, falling back to date guessing', e.message || e);
+      return null;
+    });
+  }
+  return _fjListPromise;
+}
+
 // Try days +1, +2, +3, +4 — handles weekends/holidays where the next file
 // might skip a day (e.g. no Sunday deliveries, so Monday file is uploaded instead).
 // A candidate file is only accepted if its embedded dates are actually fresh —
@@ -713,9 +730,12 @@ function _fjIsStale(rows) {
 // can still hold last month's stale data until the warehouse re-uploads it.
 // Falls back to today's file if none of +1..+4 are fresh.
 async function _loadFJDiv(prefix, varName) {
+  const list = await _fjFileList();
   for (let i = 1; i <= 4; i++) {
     const d = new Date(); d.setDate(d.getDate() + i);
-    await _loadFJExcel(prefix + '%20' + d.getDate() + '.xlsx', varName);
+    const day = d.getDate();
+    if (list && !list.includes(prefix + ' ' + day + '.xlsx')) continue; // known not to exist yet — skip
+    await _loadFJExcel(prefix + '%20' + day + '.xlsx', varName);
     if ((window[varName] || []).length && !_fjIsStale(window[varName])) return;
   }
   await _loadFJExcel(prefix + '%20' + _fjTodayDay + '.xlsx', varName);

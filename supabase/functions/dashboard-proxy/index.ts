@@ -67,6 +67,31 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     const type = url.searchParams.get('type');
     const file = url.searchParams.get('file') || '';
+
+    // Directory listing for uploads/ — lets the client check which FJ delivery
+    // files actually exist before fetching, instead of guessing forward
+    // through several dates and eating a failed request (logged loudly by the
+    // browser regardless of app-level try/catch) for each date not yet
+    // uploaded.
+    if (type === 'list') {
+      const listResp = await fetch(
+        `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/uploads`,
+        {
+          headers: {
+            Authorization: `token ${GITHUB_TOKEN}`,
+            Accept: 'application/vnd.github+json',
+          },
+          cache: 'no-store',
+        }
+      );
+      if (!listResp.ok) return fail(502, `upstream ${listResp.status}`);
+      const entries = await listResp.json();
+      const names = Array.isArray(entries) ? entries.map((e: { name: string }) => e.name) : [];
+      return new Response(JSON.stringify(names), {
+        headers: { ...cors, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+      });
+    }
+
     let ghPath: string;
     let binary: boolean;
 
