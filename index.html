@@ -578,6 +578,17 @@
 
 <div class="toast" id="toast"></div>
 
+<div class="overlay hidden" id="confirm-overlay" onclick="if(event.target===this)_settleConfirm(false)">
+  <div class="confirm-modal">
+    <div class="pm-handle"></div>
+    <div class="confirm-msg" id="confirm-msg"></div>
+    <div class="confirm-actions">
+      <button class="confirm-btn-cancel" id="confirm-btn-cancel" onclick="_settleConfirm(false)">Cancel</button>
+      <button class="confirm-btn-ok" id="confirm-btn-ok" onclick="_settleConfirm(true)">OK</button>
+    </div>
+  </div>
+</div>
+
 <script src="data/products.js"></script>
 <script src="data/stock_map.js"></script>
 <script src="data/announcements.js"></script>
@@ -756,10 +767,12 @@ async function _loadFJDiv(prefix, varName) {
     const d = new Date(); d.setDate(d.getDate() + i);
     const day = d.getDate();
     if (list && !list.includes(prefix + ' ' + day + '.xlsx')) continue; // known not to exist yet — skip
-    await _loadFJExcel(prefix + '%20' + day + '.xlsx', varName);
+    await _loadFJExcel(prefix + ' ' + day + '.xlsx', varName);
     if ((window[varName] || []).length && !_fjIsStale(window[varName])) return;
   }
-  await _loadFJExcel(prefix + '%20' + _fjTodayDay + '.xlsx', varName);
+  const todayFile = prefix + ' ' + _fjTodayDay + '.xlsx';
+  if (list && !list.includes(todayFile)) { window[varName] = window[varName] || []; return; } // known not to exist yet — skip
+  await _loadFJExcel(todayFile, varName);
 }
 
 function _loadFJAll() {
@@ -769,8 +782,16 @@ function _loadFJAll() {
         Promise.all([
           _loadFJDiv('MKU', 'FJ_MKU'),
           _loadFJDiv('MKS', 'FJ_MKS'),
-          _loadFJExcel('MKU%20' + _fjTodayDay + '.xlsx', 'FJ_MKU_TODAY'),
-          _loadFJExcel('MKS%20' + _fjTodayDay + '.xlsx', 'FJ_MKS_TODAY')
+          _fjFileList().then(function(list) {
+            return (!list || list.includes('MKU ' + _fjTodayDay + '.xlsx'))
+              ? _loadFJExcel('MKU ' + _fjTodayDay + '.xlsx', 'FJ_MKU_TODAY')
+              : (window.FJ_MKU_TODAY = []);
+          }),
+          _fjFileList().then(function(list) {
+            return (!list || list.includes('MKS ' + _fjTodayDay + '.xlsx'))
+              ? _loadFJExcel('MKS ' + _fjTodayDay + '.xlsx', 'FJ_MKS_TODAY')
+              : (window.FJ_MKS_TODAY = []);
+          })
         ]).then(function() {
           if (window._currentRep && typeof renderTarget === 'function') {
             renderTarget();

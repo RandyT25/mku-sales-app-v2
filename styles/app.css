@@ -750,7 +750,34 @@ input { font-family: var(--sans); }
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-
+/* ── CONFIRM DIALOG ──
+   In-app replacement for window.confirm() — native confirm()/alert() are
+   unreliable inside installed/standalone PWAs on mobile (can silently
+   return false or never render at all), which made every confirm()-gated
+   delete/reset action in the app look like it "did nothing". Own z-index
+   above every other overlay (toast included) since it can be triggered
+   from inside another open panel (e.g. deleting a contact from the
+   customer modal). */
+#confirm-overlay { z-index: 500; }
+.confirm-modal {
+  background: var(--surface); border-radius: 20px 20px 0 0;
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -8px 30px rgba(17,17,24,0.12);
+  width: 100%;
+  animation: slideUp 0.26s cubic-bezier(0.34,1.3,0.64,1);
+  padding-bottom: max(env(safe-area-inset-bottom,0px), 16px);
+}
+.confirm-msg { padding: 4px 20px 18px; font-size: .92rem; font-weight: 600; line-height: 1.4; }
+.confirm-actions { display: flex; gap: 8px; padding: 0 20px; }
+.confirm-btn-cancel {
+  flex: 1; padding: 13px; border-radius: var(--r-md); border: 1.5px solid var(--border);
+  background: var(--surface); font-size: .85rem; font-weight: 700; color: var(--txt2);
+}
+.confirm-btn-ok {
+  flex: 1; padding: 13px; border-radius: var(--r-md); border: none;
+  background: var(--txt); color: var(--surface); font-size: .85rem; font-weight: 700;
+}
+.confirm-btn-ok.danger { background: var(--red); color: white; }
 
 /* ── STOCK SEARCH BAR ── */
 .stock-search-bar {

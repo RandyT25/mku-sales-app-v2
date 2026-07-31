@@ -30,8 +30,11 @@ function corsHeaders(origin: string | null) {
 }
 
 const JSFILE_ALLOWLIST = new Set(['data_sales.js', 'data.js', 'customers.js']);
-// Filenames are URL-encoded client-side (space -> %20), e.g. "MKU%2025.xlsx".
-const FJ_FILE_RE = /^(MKU|MKS)%20\d{1,2}\.xlsx$/;
+// Filenames are URL-encoded client-side via encodeURIComponent (real
+// filenames contain a space, e.g. "MKU 25.xlsx" -> "MKU%2025.xlsx" on the
+// wire); url.searchParams.get below already undoes that one layer of
+// encoding, so `file` here holds a real space character, not "%20" text.
+const FJ_FILE_RE = /^(MKU|MKS) \d{1,2}\.xlsx$/;
 
 // jsfile responses (data_sales.js/data.js/customers.js) are the slow part
 // of every login/refresh — each one is a real round trip to GitHub's API
@@ -135,9 +138,12 @@ Deno.serve(async (req) => {
     // 3. Fetch from GitHub using the server-side token — works identically
     // whether the repo is public or private, as long as the token has read
     // access to it. FJ Excel files change daily and are binary, so no
-    // caching here (unlike jsfile above).
+    // caching here (unlike jsfile above). `file` holds a real space (see
+    // FJ_FILE_RE comment above) — re-encode it explicitly rather than
+    // relying on the runtime to auto-encode a raw space inside a template
+    // literal passed to fetch().
     const ghResp = await fetch(
-      `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/uploads/${file}`,
+      `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/uploads/${encodeURIComponent(file)}`,
       {
         headers: {
           Authorization: `token ${GITHUB_TOKEN}`,

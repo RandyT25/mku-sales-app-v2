@@ -29,8 +29,14 @@ export async function updateLog(id, patch) {
 }
 
 export async function deleteLog(id) {
-  const { error } = await supabase.from('competitor_logs').delete().eq('id', id);
+  const { error, count } = await supabase.from('competitor_logs').delete({ count: 'exact' }).eq('id', id);
   if (error) throw error;
+  // A matching row exists but RLS silently excluded it from the delete
+  // (not the log's own author, not a Super Admin) — Postgres reports this
+  // as success with zero rows affected, not an error. Without this check
+  // the UI would show a false "Entry deleted" toast and the row would
+  // just reappear on the next refresh.
+  if (!count) throw new Error("You don't have permission to delete this entry.");
 }
 
 window.CompetitorIntel = { fetchLogs, createLog, updateLog, deleteLog, uploadPhoto };
