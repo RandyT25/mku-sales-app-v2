@@ -23,6 +23,7 @@
   <script type="module" src="features/today-priorities.js"></script>
   <script type="module" src="features/announcements.js"></script>
   <script type="module" src="features/rep-profile.js"></script>
+  <script type="module" src="features/admin-actions.js"></script>
 </head>
 <body>
 
@@ -454,6 +455,18 @@
       <input class="order-cust-inp" id="contacts-directory-search" placeholder="Search name, customer, or phone…" autocomplete="off" oninput="onContactsDirectorySearch(this.value)">
     </div>
     <div id="contacts-directory-list" class="drafts-list"></div>
+  </div>
+</div>
+
+<!-- RESET REP PIN (Manager / Super Admin) -->
+<div class="overlay hidden" id="reset-pin-overlay" onclick="closeResetPinPanel(event)">
+  <div class="prod-modal" id="reset-pin-modal">
+    <div class="pm-handle"></div>
+    <div class="pm-name">Reset a Rep's PIN</div>
+    <div style="padding:0 14px 10px;font-size:.7rem;color:var(--txt3);line-height:1.4">
+      Sets a temporary 6-digit PIN and forces them to choose a new one on their next login.
+    </div>
+    <div id="reset-pin-list"></div>
   </div>
 </div>
 
@@ -889,7 +902,7 @@ Promise.all([
         </label>
       </div>
       <div class="pm-det full" style="font-size:.68rem;color:var(--txt3);line-height:1.4">
-        To reset a forgotten PIN: Supabase Studio → Authentication → Users → find <b id="edit-rep-email"></b> → reset password. Can't be done from here for security reasons.
+        Login email: <b id="edit-rep-email"></b>. To reset a forgotten PIN, use the key icon next to this rep's row (or, for Managers, the key icon on the Team Leaderboard).
       </div>
     </div>
     <div class="intel-form-error" id="edit-rep-error">&nbsp;</div>
