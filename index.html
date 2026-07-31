@@ -15,16 +15,26 @@
   <meta name="apple-mobile-web-app-title" content="MKU·MKS">
   <meta name="theme-color" content="#AD1F28">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <script type="module" src="lib/auth.js"></script>
-  <script type="module" src="lib/dashboard-data.js"></script>
-  <script type="module" src="features/competitor-intel.js"></script>
-  <script type="module" src="features/customer-identity.js"></script>
-  <script type="module" src="features/customer-relations.js"></script>
-  <script type="module" src="features/today-priorities.js"></script>
-  <script type="module" src="features/announcements.js"></script>
-  <script type="module" src="features/rep-profile.js"></script>
-  <script type="module" src="features/admin-actions.js"></script>
-  <script src="lib/write-queue.js"></script>
+  <script>
+    // These were plain static <script> tags with no cache-busting, unlike
+    // the dynamically-loaded lib/app-core.js below (which already busts
+    // hourly). GitHub Pages caches individual files for 10 minutes
+    // (cache-control: max-age=600) and browsers can hold onto a fetched
+    // module even longer — confirmed live more than once that a deploy
+    // touching these files didn't actually reach an already-open tab even
+    // after a hard reload. Emitting the tags with the same hourly `?v=`
+    // query string as app-core.js fixes that the same way.
+    var _cacheBust = new Date().toISOString().slice(0, 13);
+    [
+      'lib/auth.js', 'lib/dashboard-data.js', 'features/competitor-intel.js',
+      'features/customer-identity.js', 'features/customer-relations.js',
+      'features/today-priorities.js', 'features/announcements.js',
+      'features/rep-profile.js', 'features/admin-actions.js',
+    ].forEach(function (src) {
+      document.write('<script type="module" src="' + src + '?v=' + _cacheBust + '"><' + '/script>');
+    });
+    document.write('<script src="lib/write-queue.js?v=' + _cacheBust + '"><' + '/script>');
+  </script>
 </head>
 <body>
 
