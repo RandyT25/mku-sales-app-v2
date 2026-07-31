@@ -793,6 +793,16 @@ async function _loadAllData() {
     window._customersReady = true;
     if (window._custTabOpen) renderCustomers();
     if (typeof window.refreshCustIfOpen === 'function') window.refreshCustIfOpen();
+    // Today's Priorities (buildTodayPriorities -> getRepCustomerList) needs
+    // CUSTOMERS to be loaded, but it's the default landing screen and can
+    // render before this promise settles — unlike Customers above, nothing
+    // re-ran it once real data arrived, so a rep could get stuck on a wrong
+    // "All caught up!" empty state until they manually left and returned to
+    // the tab. Re-run it here if it's still the active screen.
+    const todayScreen = document.getElementById('screen-today');
+    if (todayScreen && todayScreen.classList.contains('active') && typeof initTodayPriorities === 'function') {
+      initTodayPriorities();
+    }
   }).catch(function() { window._customersReady = false; });
   _loadFJAll();
 }
