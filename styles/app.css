@@ -899,6 +899,7 @@ input { font-family: var(--sans); }
   justify-content: center; color: var(--txt2); flex-shrink: 0;
 }
 .bell-btn:active { background: var(--red-l); color: var(--red); }
+#refresh-btn.spinning svg { animation: spin .8s linear infinite; }
 .bell-badge {
   position: absolute; top: -4px; right: -4px;
   background: var(--red); color: white;

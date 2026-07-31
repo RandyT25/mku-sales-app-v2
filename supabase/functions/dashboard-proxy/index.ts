@@ -33,6 +33,19 @@ const JSFILE_ALLOWLIST = new Set(['data_sales.js', 'data.js', 'customers.js']);
 // Filenames are URL-encoded client-side (space -> %20), e.g. "MKU%2025.xlsx".
 const FJ_FILE_RE = /^(MKU|MKS)%20\d{1,2}\.xlsx$/;
 
+// jsfile responses (data_sales.js/data.js/customers.js) are the slow part
+// of every login/refresh — each one is a real round trip to GitHub's API
+// (not its CDN), measured at ~1-2.5s per file versus ~0.5s for the old
+// direct-to-CDN fetch this proxy replaced. This data only actually changes
+// when Randy re-uploads it (at most a few times a day), so a short-lived
+// in-memory cache — kept in module scope, which Supabase Edge Functions
+// persist across requests on the same warm instance — turns repeat
+// requests within the window into near-instant responses without weakening
+// the auth gate above (still required on every request, cache or not).
+// Lost on a cold start; that's fine, it just refills on the next request.
+const JSFILE_CACHE_TTL_MS = 60_000;
+const jsfileCache = new Map<string, { text: string; expires: number }>();
+
 Deno.serve(async (req) => {
   const cors = corsHeaders(req.headers.get('Origin'));
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
@@ -92,27 +105,39 @@ Deno.serve(async (req) => {
       });
     }
 
-    let ghPath: string;
-    let binary: boolean;
-
     if (type === 'jsfile' && JSFILE_ALLOWLIST.has(file)) {
+      const cached = jsfileCache.get(file);
+      if (cached && cached.expires > Date.now()) {
+        return new Response(cached.text, {
+          headers: { ...cors, 'Content-Type': 'application/javascript; charset=utf-8', 'Cache-Control': 'no-store', 'X-Cache': 'HIT' },
+        });
+      }
       // These files are served from the repo's GitHub Pages source dir, not
       // repo root (confirmed via the Contents API: root has no .js files,
       // docs/ has data_sales.js, data.js, customers.js).
-      ghPath = `docs/${file}`;
-      binary = false;
-    } else if (type === 'fj' && FJ_FILE_RE.test(file)) {
-      ghPath = `uploads/${file}`;
-      binary = true;
-    } else {
-      return fail(400, 'invalid type/file');
+      const ghResp = await fetch(
+        `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/docs/${file}`,
+        {
+          headers: { Authorization: `token ${GITHUB_TOKEN}`, Accept: 'application/vnd.github.raw' },
+          cache: 'no-store',
+        }
+      );
+      if (!ghResp.ok) return fail(502, `upstream ${ghResp.status}`);
+      const text = await ghResp.text();
+      jsfileCache.set(file, { text, expires: Date.now() + JSFILE_CACHE_TTL_MS });
+      return new Response(text, {
+        headers: { ...cors, 'Content-Type': 'application/javascript; charset=utf-8', 'Cache-Control': 'no-store', 'X-Cache': 'MISS' },
+      });
     }
+
+    if (type !== 'fj' || !FJ_FILE_RE.test(file)) return fail(400, 'invalid type/file');
 
     // 3. Fetch from GitHub using the server-side token — works identically
     // whether the repo is public or private, as long as the token has read
-    // access to it.
+    // access to it. FJ Excel files change daily and are binary, so no
+    // caching here (unlike jsfile above).
     const ghResp = await fetch(
-      `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${ghPath}`,
+      `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/uploads/${file}`,
       {
         headers: {
           Authorization: `token ${GITHUB_TOKEN}`,
@@ -123,15 +148,9 @@ Deno.serve(async (req) => {
     );
     if (!ghResp.ok) return fail(502, `upstream ${ghResp.status}`);
 
-    if (binary) {
-      const buf = await ghResp.arrayBuffer();
-      return new Response(buf, {
-        headers: { ...cors, 'Content-Type': 'application/octet-stream', 'Cache-Control': 'no-store' },
-      });
-    }
-    const text = await ghResp.text();
-    return new Response(text, {
-      headers: { ...cors, 'Content-Type': 'application/javascript; charset=utf-8', 'Cache-Control': 'no-store' },
+    const buf = await ghResp.arrayBuffer();
+    return new Response(buf, {
+      headers: { ...cors, 'Content-Type': 'application/octet-stream', 'Cache-Control': 'no-store' },
     });
   } catch (e) {
     console.error('dashboard-proxy error', e);

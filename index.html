@@ -57,6 +57,9 @@
     </div>
     <div class="topbar-right">
       <div class="topbar-date" id="topbar-date">—</div>
+      <button class="bell-btn" id="refresh-btn" onclick="_refreshCurrentScreen({showToast:true})" title="Refresh">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+      </button>
       <button class="bell-btn hidden" id="wq-btn" title="Pending items — will sync automatically once you're back online">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
         <div class="bell-badge hidden" id="wq-badge">0</div>
@@ -672,18 +675,6 @@ function _bootAuth() {
   }).catch(e => { console.error('restoreSession error:', e); _showLogin(); });
 }
 
-// Re-fetch just the sales data feed in place (no page reload, no touching
-// login state) so a long-backgrounded app shows fresh numbers on resume
-// without disturbing the rep's session. Called only while a rep is already
-// actively using the app, so a valid session is guaranteed.
-function _refreshDataInPlace() {
-  window.DashboardData.loadSales().then(function() {
-    if (window._currentRep && typeof renderTarget === 'function') {
-      try { renderTarget(); } catch (e) { console.error('renderTarget refresh error:', e); }
-    }
-  }).catch(function() { console.warn('Background data refresh failed'); });
-}
-
 function _dataFailed() {
   clearInterval(_barTimer);
   const el = document.getElementById('load-msg');
@@ -986,12 +977,18 @@ window.addEventListener('appinstalled', () => {
   document.getElementById('install-banner')?.classList.add('hidden');
 });
 let _hiddenAt = null;
+// Was gated at 10+ minutes hidden and only ever refreshed sales data for
+// the Target screen — too conservative for "background the app for a
+// minute or two and come back to it", and left every other screen showing
+// stale data indefinitely. Now refreshes at 1+ minute hidden and re-renders
+// whichever screen is actually active, via the same _refreshCurrentScreen()
+// (lib/app-core.js) the manual refresh button and reconnect handling use.
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     _hiddenAt = Date.now();
-  } else if (_hiddenAt && Date.now() - _hiddenAt > 10 * 60 * 1000) {
+  } else if (_hiddenAt && Date.now() - _hiddenAt > 60 * 1000) {
     _hiddenAt = null;
-    _refreshDataInPlace();
+    if (typeof _refreshCurrentScreen === 'function') _refreshCurrentScreen();
   }
 });
 </script>
