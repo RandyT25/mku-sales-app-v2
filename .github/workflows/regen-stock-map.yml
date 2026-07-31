@@ -1,0 +1,47 @@
+name: Regenerate stock map
+
+# Rebuilds data/stock_map.js (product ID -> warehouse code bridge) against
+# the live stock feed and opens a PR with the diff, rather than committing
+# straight to main — this repo has no automated tests, so a human eyeballs
+# catalog-data changes before they ship. ERP codes rarely change, so weekly
+# is plenty; workflow_dispatch is there for an on-demand run too.
+#
+# Note: the GITHUB_TOKEN used below is the one GitHub Actions provides
+# automatically to open the PR — unrelated to the *Supabase* secret of the
+# same name that supabase/functions/dashboard-proxy uses to read from this
+# same repo. Don't confuse the two.
+
+on:
+  schedule:
+    - cron: '0 3 * * 1' # Mondays 03:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  regen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Regenerate data/stock_map.js
+        run: node scripts/regen-stock-map.mjs
+
+      - name: Open PR if changed
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: regenerate stock map from live feed'
+          title: 'chore: regenerate stock map from live feed'
+          body: |
+            Automated weekly run of `scripts/regen-stock-map.mjs`.
+            Review the diff before merging — this is name-matched against
+            the live stock feed, not a guaranteed-correct source.
+          branch: chore/regen-stock-map
+          delete-branch: true
