@@ -244,6 +244,7 @@
             <option value="name">A–Z</option>
             <option value="inactive">Least Active</option>
           </select>
+          <button class="of-draft" style="width:32px;height:32px;padding:7px" onclick="exportCustomersXlsx()" title="Export to Excel"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 19h16"/></svg></button>
         </div>
       </div>
       <div id="cust-list"></div>
@@ -259,6 +260,7 @@
         <div class="intel-view-tabs">
           <button class="intel-view-tab active" onclick="switchIntelView('recent',this)">Recent</button>
           <button class="intel-view-tab" onclick="switchIntelView('summary',this)">By Competitor</button>
+          <button class="of-draft" style="width:32px;height:32px;padding:7px" onclick="exportIntelXlsx()" title="Export to Excel"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 19h16"/></svg></button>
         </div>
       </div>
       <div id="intel-list"></div>
