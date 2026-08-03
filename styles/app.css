@@ -708,6 +708,9 @@ input { font-family: var(--sans); }
 .pm-det-label { font-size: .62rem; text-transform: uppercase; letter-spacing: 0.4px; color: var(--txt3); font-weight: 600; margin-bottom: 2px; }
 .pm-det-val { font-size: .82rem; font-weight: 600; }
 
+.pm-sold-to { padding: 4px 20px 12px; }
+.pm-sold-title { font-size: .8rem; font-weight: 700; color: var(--txt2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+
 .pm-actions { display: flex; gap: 8px; padding: 4px 20px 0; }
 .pm-btn-wa { flex: 1; padding: 13px; border-radius: var(--r-md); border: none; background: #25D366; color: white; font-size: .85rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; }
 .pm-btn-add { flex: 1; padding: 13px; border-radius: var(--r-md); border: none; background: var(--red); color: white; font-size: .85rem; font-weight: 700; }
