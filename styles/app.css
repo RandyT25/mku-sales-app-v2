@@ -396,6 +396,7 @@ input { font-family: var(--sans); }
 .tc-so-cust-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
 .tc-so-cust { font-size: .8rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
 .tc-so-cust-total { font-family: var(--mono); font-size: .75rem; font-weight: 700; color: var(--red); flex-shrink: 0; margin-left: 6px; }
+.tc-so-cust-total.neutral { color: var(--txt3); }
 .tc-so-subgroup { margin-bottom: 4px; }
 .tc-so-subgroup:last-child { margin-bottom: 0; }
 .tc-so-subhdr { display: flex; justify-content: space-between; align-items: center; padding: 2px 0 3px; border-top: 1px solid var(--border); }
