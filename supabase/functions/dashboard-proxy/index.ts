@@ -90,19 +90,34 @@ Deno.serve(async (req) => {
     // browser regardless of app-level try/catch) for each date not yet
     // uploaded.
     if (type === 'list') {
-      const listResp = await fetch(
-        `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/uploads`,
-        {
-          headers: {
-            Authorization: `token ${GITHUB_TOKEN}`,
-            Accept: 'application/vnd.github+json',
-          },
-          cache: 'no-store',
-        }
-      );
-      if (!listResp.ok) return fail(502, `upstream ${listResp.status}`);
-      const entries = await listResp.json();
-      const names = Array.isArray(entries) ? entries.map((e: { name: string }) => e.name) : [];
+      // The sibling pipeline archives MKU/MKS delivery files into
+      // uploads/archive/ shortly after each upload (see the `fj` fetch
+      // below) — merge both listings so the client's existence pre-check
+      // still finds a file after it's been archived, instead of wrongly
+      // concluding it was never uploaded. The archive listing is
+      // best-effort: treat a missing/erroring uploads/archive (e.g. before
+      // the first archive ever happens) as empty, not a hard failure.
+      const fetchNames = async (path: string): Promise<string[] | null> => {
+        const r = await fetch(
+          `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`,
+          {
+            headers: {
+              Authorization: `token ${GITHUB_TOKEN}`,
+              Accept: 'application/vnd.github+json',
+            },
+            cache: 'no-store',
+          }
+        );
+        if (!r.ok) return null;
+        const entries = await r.json();
+        return Array.isArray(entries) ? entries.map((e: { name: string }) => e.name) : [];
+      };
+      const [uploadNames, archiveNames] = await Promise.all([
+        fetchNames('uploads'),
+        fetchNames('uploads/archive'),
+      ]);
+      if (uploadNames === null) return fail(502, 'upstream error listing uploads');
+      const names = [...new Set([...uploadNames, ...(archiveNames || [])])];
       return new Response(JSON.stringify(names), {
         headers: { ...cors, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
       });
@@ -142,16 +157,26 @@ Deno.serve(async (req) => {
     // FJ_FILE_RE comment above) — re-encode it explicitly rather than
     // relying on the runtime to auto-encode a raw space inside a template
     // literal passed to fetch().
-    const ghResp = await fetch(
-      `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/uploads/${encodeURIComponent(file)}`,
-      {
-        headers: {
-          Authorization: `token ${GITHUB_TOKEN}`,
-          Accept: 'application/vnd.github.raw',
-        },
-        cache: 'no-store',
-      }
-    );
+    const fetchFj = (path: string) =>
+      fetch(
+        `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}/${encodeURIComponent(file)}`,
+        {
+          headers: {
+            Authorization: `token ${GITHUB_TOKEN}`,
+            Accept: 'application/vnd.github.raw',
+          },
+          cache: 'no-store',
+        }
+      );
+
+    // The sibling pipeline archives MKU/MKS delivery files into
+    // uploads/archive/ shortly after each upload (so its own uploads/ glob
+    // doesn't reprocess stale day-only filenames on a future run) — try the
+    // live location first (freshest, covers the narrow pre-archive window),
+    // then the archive, so the app keeps working across that transition
+    // instead of the file going dark the moment it's processed.
+    let ghResp = await fetchFj('uploads');
+    if (ghResp.status === 404) ghResp = await fetchFj('uploads/archive');
     if (!ghResp.ok) return fail(502, `upstream ${ghResp.status}`);
 
     const buf = await ghResp.arrayBuffer();
