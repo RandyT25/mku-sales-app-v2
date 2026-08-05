@@ -55,14 +55,20 @@ export async function createVisit(entry) {
 // Regular reps still can't edit/delete visit notes at all (append-only by
 // design — "a visit note is a historical record"), this is a moderation
 // override, not a new general capability.
+// {count:'exact'} + the zero-rows check matches deleteLog()'s pattern
+// (features/competitor-intel.js) — an RLS-blocked write reports success
+// with 0 rows affected rather than an error, which would otherwise show a
+// false "saved"/"deleted" toast while the row silently didn't change.
 export async function updateVisit(id, note) {
-  const { error } = await supabase.from('customer_visits').update({ note }).eq('id', id);
+  const { error, count } = await supabase.from('customer_visits').update({ note }, { count: 'exact' }).eq('id', id);
   if (error) throw error;
+  if (!count) throw new Error("You don't have permission to edit this entry.");
 }
 
 export async function deleteVisit(id) {
-  const { error } = await supabase.from('customer_visits').delete().eq('id', id);
+  const { error, count } = await supabase.from('customer_visits').delete({ count: 'exact' }).eq('id', id);
   if (error) throw error;
+  if (!count) throw new Error("You don't have permission to delete this entry.");
 }
 
 window.CustomerRelations = {
