@@ -24,4 +24,12 @@ export async function resolveRepIdByName(name) {
   return data.id;
 }
 
-window.Announcements = { fetchAnnouncements, createAnnouncement, resolveRepIdByName };
+// Super Admin only — RLS-gated (0014_super_admin_full_moderation.sql).
+// No policy for regular Managers to delete their own; announcements stay
+// append-only for everyone except this moderation override.
+export async function deleteAnnouncement(id) {
+  const { error } = await supabase.from('announcements').delete().eq('id', id);
+  if (error) throw error;
+}
+
+window.Announcements = { fetchAnnouncements, createAnnouncement, resolveRepIdByName, deleteAnnouncement };

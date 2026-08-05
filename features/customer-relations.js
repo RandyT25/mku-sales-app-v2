@@ -51,4 +51,21 @@ export async function createVisit(entry) {
   if (error) throw error;
 }
 
-window.CustomerRelations = { fetchContacts, createContact, updateContact, deleteContact, fetchVisits, createVisit, fetchAllContacts };
+// Super Admin only — RLS-gated (0014_super_admin_full_moderation.sql).
+// Regular reps still can't edit/delete visit notes at all (append-only by
+// design — "a visit note is a historical record"), this is a moderation
+// override, not a new general capability.
+export async function updateVisit(id, note) {
+  const { error } = await supabase.from('customer_visits').update({ note }).eq('id', id);
+  if (error) throw error;
+}
+
+export async function deleteVisit(id) {
+  const { error } = await supabase.from('customer_visits').delete().eq('id', id);
+  if (error) throw error;
+}
+
+window.CustomerRelations = {
+  fetchContacts, createContact, updateContact, deleteContact,
+  fetchVisits, createVisit, updateVisit, deleteVisit, fetchAllContacts,
+};
