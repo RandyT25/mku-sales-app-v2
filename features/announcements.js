@@ -24,4 +24,17 @@ export async function resolveRepIdByName(name) {
   return data.id;
 }
 
-window.Announcements = { fetchAnnouncements, createAnnouncement, resolveRepIdByName };
+// Super Admin only — RLS-gated (0014_super_admin_full_moderation.sql).
+// No policy for regular Managers to delete their own; announcements stay
+// append-only for everyone except this moderation override.
+// {count:'exact'} + the zero-rows check matches deleteLog()'s pattern
+// (features/competitor-intel.js) — an RLS-blocked delete reports success
+// with 0 rows affected rather than an error, which would otherwise show a
+// false "deleted" toast while the row silently survives.
+export async function deleteAnnouncement(id) {
+  const { error, count } = await supabase.from('announcements').delete({ count: 'exact' }).eq('id', id);
+  if (error) throw error;
+  if (!count) throw new Error("You don't have permission to delete this entry.");
+}
+
+window.Announcements = { fetchAnnouncements, createAnnouncement, resolveRepIdByName, deleteAnnouncement };
