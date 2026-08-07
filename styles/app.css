@@ -1312,6 +1312,23 @@ input { font-family: var(--sans); }
 .intel-card-actions { display: flex; gap: 4px; flex-shrink: 0; }
 .intel-card-actions button { width: 24px; height: 24px; border-radius: 50%; border: none; background: var(--bg); color: var(--txt2); display: flex; align-items: center; justify-content: center; }
 
+.deal-status-pill { display: inline-block; font-size: .62rem; font-weight: 700; text-transform: uppercase; letter-spacing: .02em; padding: 2px 7px; border-radius: 20px; margin-top: 4px; }
+.deal-status-pill.pending { background: var(--gold-l); color: var(--gold); }
+.deal-status-pill.held { background: var(--orange-l); color: var(--gold); }
+.deal-status-pill.fulfilled { background: var(--green-l); color: var(--green); }
+.deal-status-pill.declined { background: var(--bg); color: var(--txt3); }
+.deal-actions { display: flex; gap: 4px; flex-shrink: 0; margin-left: auto; }
+.deal-action-btn { border: 1px solid var(--border); background: var(--bg); color: var(--txt2); font-size: .65rem; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
+.deal-action-btn.held, .deal-action-btn.fulfilled { border-color: var(--green); color: var(--green); }
+.deal-action-btn.declined { border-color: var(--red); color: var(--red); }
+
+.deal-product-results { position: relative; margin-top: 4px; border: 1px solid var(--border); border-radius: var(--r-sm); overflow: hidden; }
+.deal-product-row { padding: 8px 10px; font-size: .78rem; color: var(--txt); background: var(--surface); border-top: 1px solid var(--border); }
+.deal-product-row:first-child { border-top: none; }
+.deal-product-row.deal-product-empty { color: var(--txt3); }
+.deal-product-row:not(.deal-product-empty):active { background: var(--bg); }
+.deal-stock-info { font-size: .72rem; color: var(--txt2); margin-top: 6px; }
+
 .intel-fab {
   position: fixed; bottom: calc(var(--nav-h) + 14px); left: 14px; right: 14px;
   padding: 13px; border-radius: var(--r-md); z-index: 25;

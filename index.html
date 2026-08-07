@@ -29,7 +29,7 @@
       'lib/auth.js', 'lib/dashboard-data.js', 'features/competitor-intel.js',
       'features/customer-identity.js', 'features/customer-relations.js',
       'features/today-priorities.js', 'features/announcements.js',
-      'features/rep-profile.js', 'features/admin-actions.js',
+      'features/rep-profile.js', 'features/admin-actions.js', 'features/deals.js',
     ].forEach(function (src) {
       document.write('<script type="module" src="' + src + '?v=' + _cacheBust + '"><' + '/script>');
     });
@@ -263,7 +263,7 @@
             <option value="name">A–Z</option>
             <option value="inactive">Least Active</option>
           </select>
-          <button class="of-draft" style="width:32px;height:32px;padding:7px" onclick="exportCustomersXlsx()" title="Export to Excel"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 19h16"/></svg></button>
+          <button class="of-draft hidden" id="export-customers-btn" style="width:32px;height:32px;padding:7px" onclick="exportCustomersXlsx()" title="Export to Excel"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 19h16"/></svg></button>
         </div>
       </div>
       <div id="cust-list"></div>
@@ -279,13 +279,18 @@
         <div class="intel-view-tabs">
           <button class="intel-view-tab active" onclick="switchIntelView('recent',this)">Recent</button>
           <button class="intel-view-tab" onclick="switchIntelView('summary',this)">By Competitor</button>
-          <button class="of-draft" style="width:32px;height:32px;padding:7px" onclick="exportIntelXlsx()" title="Export to Excel"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 19h16"/></svg></button>
+          <button class="intel-view-tab" onclick="switchIntelView('deals',this)">Deals</button>
+          <button class="of-draft hidden" id="export-intel-btn" style="width:32px;height:32px;padding:7px" onclick="exportIntelXlsx()" title="Export to Excel"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 19h16"/></svg></button>
         </div>
       </div>
       <div id="intel-list"></div>
-      <button class="intel-fab" onclick="openIntelForm()">
+      <button class="intel-fab" id="intel-fab-price" onclick="openIntelForm()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
         Log Price
+      </button>
+      <button class="intel-fab hidden" id="intel-fab-deal" onclick="openDealForm()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Request Deal
       </button>
     </div>
 
@@ -339,6 +344,49 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
       </button>
       <button class="pm-btn-add" style="flex:1" onclick="submitIntelForm()">Save Log Entry</button>
+    </div>
+  </div>
+</div>
+
+<!-- DEAL / KEEP-STOCK FORM -->
+<div class="overlay hidden" id="deal-form-overlay" onclick="closeDealForm(event)">
+  <div class="prod-modal" id="deal-form-modal">
+    <div class="pm-handle"></div>
+    <div class="pm-name" id="deal-form-title">Request Deal / Hold Stock</div>
+    <div class="pm-details" style="grid-template-columns:1fr">
+      <div class="pm-det full">
+        <div class="pm-det-label">Product *</div>
+        <input class="order-cust-inp" id="deal-product-inp" placeholder="Search product…" autocomplete="off" oninput="onDealProductSearch(this.value)">
+        <div id="deal-product-results" class="deal-product-results hidden"></div>
+        <div id="deal-stock-info" class="deal-stock-info"></div>
+      </div>
+      <div class="pm-det full">
+        <div class="pm-det-label">Customer *</div>
+        <input class="order-cust-inp" id="deal-customer" placeholder="e.g. Hotel Grand Mulia" autocomplete="off">
+      </div>
+      <div class="pm-det full">
+        <div class="pm-det-label">Quantity *</div>
+        <input class="order-cust-inp" id="deal-qty" type="number" inputmode="decimal" placeholder="e.g. 20" autocomplete="off">
+      </div>
+      <div class="pm-det full">
+        <div class="pm-det-label">Agreed Price</div>
+        <input class="order-cust-inp" id="deal-price" type="number" inputmode="decimal" placeholder="Optional" autocomplete="off">
+      </div>
+      <div class="pm-det full">
+        <div class="pm-det-label">Discount / Deal Terms</div>
+        <input class="order-cust-inp" id="deal-discount" placeholder="Optional" autocomplete="off">
+      </div>
+      <div class="pm-det full">
+        <div class="pm-det-label">Reason / Notes</div>
+        <input class="order-cust-inp" id="deal-reason" placeholder="Optional" autocomplete="off">
+      </div>
+    </div>
+    <div class="intel-form-error" id="deal-form-error">&nbsp;</div>
+    <div class="pm-actions">
+      <button class="pm-btn-close" onclick="closeDealForm()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <button class="pm-btn-add" style="flex:1" onclick="submitDealForm()">Submit Deal Request</button>
     </div>
   </div>
 </div>
@@ -550,9 +598,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       <span>Customers</span>
     </button>
-    <button class="bnav" id="bnav-intel" onclick="switchTab('intel')">
+    <button class="bnav order-bnav" id="bnav-intel" onclick="switchTab('intel')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
       <span>Intel</span>
+      <div class="order-badge" id="deals-badge" style="display:none">0</div>
     </button>
   </nav>
 
