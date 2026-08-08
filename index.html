@@ -721,8 +721,15 @@ function _dataLoaded() {
   // Load the app JS, then check for a restorable session before deciding
   // whether the rep-picker/PIN screen needs to be shown at all.
   _loadScript('lib/app-core.js?v=' + new Date().toISOString().slice(0,13), _bootAuth, function() {
-    document.getElementById('load-msg').textContent = 'App failed to load — try refreshing';
-    document.getElementById('load-msg').style.color = '#F08080';
+    const el = document.getElementById('load-msg');
+    if (!el) return;
+    el.style.color = '#F08080';
+    el.style.textTransform = 'none';
+    el.style.letterSpacing = 'normal';
+    el.style.textAlign = 'center';
+    el.innerHTML = `
+      <div style="margin-bottom:14px">App failed to load — check your connection.</div>
+      <button onclick="location.reload()" style="display:block;width:220px;margin:0 auto;padding:11px;border-radius:10px;border:none;background:#AD1F28;color:#fff;font-size:.85rem;font-weight:700;letter-spacing:normal;text-transform:none">Retry</button>`;
   });
 }
 
@@ -746,10 +753,56 @@ function _bootAuth() {
   }).catch(e => { console.error('restoreSession error:', e); _showLogin(); });
 }
 
-function _dataFailed() {
+// A failed load (e.g. the dashboard-proxy Edge Function hiccups, or a
+// backgrounded installed-PWA's session/network is in a bad state on
+// resume) used to leave the rep stuck on inert "check connection" text
+// with no way forward — closing and reopening the app just re-runs the
+// exact same flow and can fail again the same way. Now offers a real
+// retry (re-attempts the data load in place) and a "start over" escape
+// hatch (signs out and reloads to a fresh login) instead of a dead end.
+function _dataFailed(err) {
   clearInterval(_barTimer);
+  console.error('boot data load failed:', err);
+  const spinner = document.querySelector('.load-spinner');
+  const barWrap = document.querySelector('.load-bar-wrap');
+  if (spinner) spinner.style.display = 'none';
+  if (barWrap) barWrap.style.display = 'none';
   const el = document.getElementById('load-msg');
-  if (el) { el.textContent = 'Failed to load — check connection'; el.style.color = '#F08080'; }
+  if (!el) return;
+  el.style.color = '#F08080';
+  el.style.textTransform = 'none';
+  el.style.letterSpacing = 'normal';
+  el.style.textAlign = 'center';
+  el.innerHTML = `
+    <div style="margin-bottom:14px">Couldn't load your data — check your connection.</div>
+    <button onclick="_retryDataLoad(this)" style="display:block;width:220px;margin:0 auto 10px;padding:11px;border-radius:10px;border:none;background:#AD1F28;color:#fff;font-size:.85rem;font-weight:700;letter-spacing:normal;text-transform:none">Retry</button>
+    <button onclick="_startOver(this)" style="display:block;width:220px;margin:0 auto;padding:11px;border-radius:10px;border:1px solid rgba(255,255,255,0.25);background:transparent;color:rgba(255,255,255,0.7);font-size:.8rem;letter-spacing:normal;text-transform:none">Log Out &amp; Start Over</button>`;
+}
+
+function _retryDataLoad(btn) {
+  const el = document.getElementById('load-msg');
+  if (el) { el.style.textAlign = ''; el.innerHTML = 'Retrying…'; }
+  const spinner = document.querySelector('.load-spinner');
+  const barWrap = document.querySelector('.load-bar-wrap');
+  if (spinner) spinner.style.display = '';
+  if (barWrap) barWrap.style.display = '';
+  _barTimer = (function() {
+    let p = 0;
+    return setInterval(() => {
+      p = Math.min(p + Math.random() * 6, 85);
+      const b = document.getElementById('load-bar');
+      if (b) b.style.width = p + '%';
+    }, 400);
+  })();
+  _loadAllData().then(_dataLoaded).catch(_dataFailed);
+}
+
+async function _startOver(btn) {
+  try {
+    const mod = await import('./lib/auth.js');
+    await mod.logout();
+  } catch (e) { console.warn('_startOver: signOut failed', e); }
+  location.reload();
 }
 
 // FJ delivery Excel files, sales data, and customer data all now route
