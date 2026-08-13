@@ -44,6 +44,7 @@ const REPS = [
   { name: 'Manager',        area: 'Management', is_manager: true },
   { name: 'Bisdev Food',      area: 'Company-wide (Food)',      bisdev_category: 'food' },
   { name: 'Bisdev Beverage',  area: 'Company-wide (Beverage)',  bisdev_category: 'beverage' },
+  { name: 'Bisdev Bakery',    area: 'Company-wide (Bakery)',    bisdev_category: 'bakery' },
   { name: 'Nestle Coordinator', area: 'Nestle Team Overview',   is_nestle_coordinator: true },
   { name: 'Super Admin',        area: 'Super Admin',            is_super_admin: true },
 ];
