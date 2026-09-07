@@ -210,6 +210,29 @@ input { font-family: var(--sans); }
 .login-pin-key--ghost { background: none; border: none; cursor: default; pointer-events: none; }
 .login-pin-key--action { color: rgba(255,255,255,0.6); }
 
+/* Overrides for PIN keypad inside light modals (Change PIN) */
+#change-pin-modal .login-pin-key {
+  color: var(--txt);
+  background: var(--bg);
+  border-color: var(--border);
+}
+#change-pin-modal .login-pin-key:active {
+  background: var(--border);
+}
+#change-pin-modal .login-pin-key--action {
+  color: var(--txt2);
+}
+#change-pin-modal .login-pin-dot {
+  border-color: var(--border);
+}
+#change-pin-modal .login-pin-dot.filled {
+  background: var(--txt);
+  border-color: var(--txt);
+}
+#change-pin-modal .login-pin-error {
+  color: var(--critical);
+}
+
 /* ── MAIN APP LAYOUT ── */
 .main-app {
   display: flex;
