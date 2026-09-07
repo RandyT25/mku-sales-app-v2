@@ -211,6 +211,14 @@ input { font-family: var(--sans); }
 .login-pin-key--action { color: rgba(255,255,255,0.6); }
 
 /* Overrides for PIN keypad inside light modals (Change PIN) */
+#change-pin-title {
+  text-align: center;
+  border-bottom: none;
+  padding-bottom: 4px;
+}
+#change-pin-modal .login-pin-keypad {
+  margin: 14px auto 20px;
+}
 #change-pin-modal .login-pin-key {
   color: var(--txt);
   background: var(--bg);
