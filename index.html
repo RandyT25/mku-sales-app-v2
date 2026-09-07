@@ -22,9 +22,9 @@
     // (cache-control: max-age=600) and browsers can hold onto a fetched
     // module even longer — confirmed live more than once that a deploy
     // touching these files didn't actually reach an already-open tab even
-    // after a hard reload. Emitting the tags with the same hourly `?v=`
+    // Emitting the tags with the same per-minute `?v=`
     // query string as app-core.js fixes that the same way.
-    var _cacheBust = new Date().toISOString().slice(0, 13);
+    var _cacheBust = new Date().toISOString().slice(0, 16);
     [
       'lib/auth.js', 'lib/dashboard-data.js', 'features/competitor-intel.js',
       'features/customer-identity.js', 'features/customer-relations.js',
@@ -735,7 +735,7 @@ function _dataLoaded() {
   if (b) b.style.width = '100%';
   // Load the app JS, then check for a restorable session before deciding
   // whether the rep-picker/PIN screen needs to be shown at all.
-  _loadScript('lib/app-core.js?v=' + new Date().toISOString().slice(0,13), _bootAuth, function() {
+  _loadScript('lib/app-core.js?v=' + new Date().toISOString().slice(0,16), _bootAuth, function() {
     const el = document.getElementById('load-msg');
     if (!el) return;
     el.style.color = '#F08080';
