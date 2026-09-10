@@ -30,7 +30,7 @@ const REPS = [
   { name: 'Picrom',         area: 'UBUD' },
   { name: 'I Made Luih',    area: 'DENPASAR - SANUR' },
   { name: 'Juni',           area: 'KUTA SEL - ULUWATU' },
-  { name: 'Lani',           area: 'KUTA - INDUSTRI / HOTEL' },
+  { name: 'Ronald',         area: 'KUTA - INDUSTRI / HOTEL' },
   { name: 'Monica',         area: 'KUTA SEL - NUSA DUA' },
   { name: 'Sujana',         area: 'SEMINYAK' },
   { name: 'Eka',            area: 'KUTA - LEGIAN' },
