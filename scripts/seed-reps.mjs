@@ -39,7 +39,7 @@ const REPS = [
   { name: 'Wira',           area: 'GT + FOODY' },
   { name: 'Sriasih',        area: 'MODERN + GT' },
   { name: 'Ridwan',         area: 'NP-1 (Nestlé)' },
-  { name: 'Redi',           area: 'NP-2 (Nestlé)' },
+  { name: 'Widi',           area: 'NP-2 (Nestlé)' },
   { name: 'Gek Mas',        area: 'NP-3 (Nestlé)' },
   { name: 'Manager',        area: 'Management', is_manager: true },
   { name: 'Bisdev Food',      area: 'Company-wide (Food)',      bisdev_category: 'food' },
