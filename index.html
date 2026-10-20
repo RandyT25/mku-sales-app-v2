@@ -892,6 +892,9 @@ async function _loadFJDiv(prefix, varName) {
   const todayFile = prefix + ' ' + _fjTodayDay + '.xlsx';
   if (list && !list.includes(todayFile)) { window[varName] = window[varName] || []; return; } // known not to exist yet — skip
   await _loadFJExcel(todayFile, varName);
+  if ((window[varName] || []).length && _fjIsStale(window[varName])) {
+    window[varName] = [];
+  }
 }
 
 function _loadFJAll() {
@@ -901,15 +904,21 @@ function _loadFJAll() {
         Promise.all([
           _loadFJDiv('MKU', 'FJ_MKU'),
           _loadFJDiv('MKS', 'FJ_MKS'),
-          _fjFileList().then(function(list) {
-            return (!list || list.includes('MKU ' + _fjTodayDay + '.xlsx'))
-              ? _loadFJExcel('MKU ' + _fjTodayDay + '.xlsx', 'FJ_MKU_TODAY')
-              : (window.FJ_MKU_TODAY = []);
+          _fjFileList().then(async function(list) {
+            if (!list || list.includes('MKU ' + _fjTodayDay + '.xlsx')) {
+              await _loadFJExcel('MKU ' + _fjTodayDay + '.xlsx', 'FJ_MKU_TODAY');
+              if (_fjIsStale(window.FJ_MKU_TODAY || [])) window.FJ_MKU_TODAY = [];
+            } else {
+              window.FJ_MKU_TODAY = [];
+            }
           }),
-          _fjFileList().then(function(list) {
-            return (!list || list.includes('MKS ' + _fjTodayDay + '.xlsx'))
-              ? _loadFJExcel('MKS ' + _fjTodayDay + '.xlsx', 'FJ_MKS_TODAY')
-              : (window.FJ_MKS_TODAY = []);
+          _fjFileList().then(async function(list) {
+            if (!list || list.includes('MKS ' + _fjTodayDay + '.xlsx')) {
+              await _loadFJExcel('MKS ' + _fjTodayDay + '.xlsx', 'FJ_MKS_TODAY');
+              if (_fjIsStale(window.FJ_MKS_TODAY || [])) window.FJ_MKS_TODAY = [];
+            } else {
+              window.FJ_MKS_TODAY = [];
+            }
           })
         ]).then(function() {
           if (window._currentRep && typeof renderTarget === 'function') {
