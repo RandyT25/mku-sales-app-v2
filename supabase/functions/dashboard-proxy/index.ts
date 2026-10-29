@@ -49,6 +49,28 @@ const FJ_FILE_RE = /^(MKU|MKS) \d{1,2}\.xlsx$/;
 const JSFILE_CACHE_TTL_MS = 60_000;
 const jsfileCache = new Map<string, { text: string; expires: number }>();
 
+async function fetchGh(path: string, accept: string): Promise<Response> {
+  const headers: Record<string, string> = { Accept: accept };
+  if (GITHUB_TOKEN) {
+    headers.Authorization = `token ${GITHUB_TOKEN}`;
+  }
+  let resp = await fetch(
+    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`,
+    { headers, cache: 'no-store' }
+  );
+  // If the token is invalid or expired (HTTP 401), retry without auth header
+  // as a graceful fallback so sales reps are not locked out when a PAT expires.
+  if (resp.status === 401 && headers.Authorization) {
+    console.warn(`GitHub API returned 401 with token; retrying unauthenticated for ${path}`);
+    delete headers.Authorization;
+    resp = await fetch(
+      `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`,
+      { headers, cache: 'no-store' }
+    );
+  }
+  return resp;
+}
+
 Deno.serve(async (req) => {
   const cors = corsHeaders(req.headers.get('Origin'));
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
@@ -98,16 +120,7 @@ Deno.serve(async (req) => {
       // best-effort: treat a missing/erroring uploads/archive (e.g. before
       // the first archive ever happens) as empty, not a hard failure.
       const fetchNames = async (path: string): Promise<string[] | null> => {
-        const r = await fetch(
-          `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`,
-          {
-            headers: {
-              Authorization: `token ${GITHUB_TOKEN}`,
-              Accept: 'application/vnd.github+json',
-            },
-            cache: 'no-store',
-          }
-        );
+        const r = await fetchGh(path, 'application/vnd.github+json');
         if (!r.ok) return null;
         const entries = await r.json();
         return Array.isArray(entries) ? entries.map((e: { name: string }) => e.name) : [];
@@ -133,13 +146,7 @@ Deno.serve(async (req) => {
       // These files are served from the repo's GitHub Pages source dir, not
       // repo root (confirmed via the Contents API: root has no .js files,
       // docs/ has data_sales.js, data.js, customers.js).
-      const ghResp = await fetch(
-        `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/docs/${file}`,
-        {
-          headers: { Authorization: `token ${GITHUB_TOKEN}`, Accept: 'application/vnd.github.raw' },
-          cache: 'no-store',
-        }
-      );
+      const ghResp = await fetchGh(`docs/${file}`, 'application/vnd.github.raw');
       if (!ghResp.ok) return fail(502, `upstream ${ghResp.status}`);
       const text = await ghResp.text();
       jsfileCache.set(file, { text, expires: Date.now() + JSFILE_CACHE_TTL_MS });
@@ -150,24 +157,13 @@ Deno.serve(async (req) => {
 
     if (type !== 'fj' || !FJ_FILE_RE.test(file)) return fail(400, 'invalid type/file');
 
-    // 3. Fetch from GitHub using the server-side token — works identically
-    // whether the repo is public or private, as long as the token has read
-    // access to it. FJ Excel files change daily and are binary, so no
-    // caching here (unlike jsfile above). `file` holds a real space (see
-    // FJ_FILE_RE comment above) — re-encode it explicitly rather than
-    // relying on the runtime to auto-encode a raw space inside a template
-    // literal passed to fetch().
-    const fetchFj = (path: string) =>
-      fetch(
-        `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}/${encodeURIComponent(file)}`,
-        {
-          headers: {
-            Authorization: `token ${GITHUB_TOKEN}`,
-            Accept: 'application/vnd.github.raw',
-          },
-          cache: 'no-store',
-        }
-      );
+    // 3. Fetch from GitHub using fetchGh (with server token, falling back
+    // to unauthenticated if token expires). FJ Excel files change daily and
+    // are binary, so no caching here (unlike jsfile above). `file` holds a
+    // real space (see FJ_FILE_RE comment above) — re-encode it explicitly
+    // rather than relying on the runtime to auto-encode a raw space inside
+    // a template literal passed to fetch().
+    const fetchFj = (path: string) => fetchGh(`${path}/${encodeURIComponent(file)}`, 'application/vnd.github.raw');
 
     // The sibling pipeline archives MKU/MKS delivery files into
     // uploads/archive/ shortly after each upload (so its own uploads/ glob
