@@ -759,7 +759,7 @@ function _bootAuth() {
   waitForGlobal('AppAuth').then(() => window.AppAuth.restoreSession()).then(repRow => {
     _showLogin();
     if (repRow) {
-      const idx = REP_CONFIG.findIndex(r => r.name === repRow.name);
+      const idx = REP_CONFIG.findIndex(r => r.name === repRow.name || r.dbName === repRow.name);
       if (idx !== -1) {
         const authInfo = { repId: repRow.id, authUserId: repRow.auth_user_id, isManager: repRow.is_manager, phone: repRow.phone, photoUrl: repRow.photo_url, bisdevCategory: repRow.bisdev_category, isNestleCoordinator: repRow.is_nestle_coordinator, isSuperAdmin: repRow.is_super_admin };
         if (repRow.is_super_admin) { _superAdminOwnIdx = idx; _superAdminOwnAuthInfo = authInfo; }
