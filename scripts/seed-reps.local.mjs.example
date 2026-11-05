@@ -13,6 +13,7 @@ export const PINS = {
   'Dewi Kristiani': '000000',
   'Wira':           '000000',
   'Sriasih':        '000000',
+  'Rijal':          '000000',
   'Ridwan':         '000000',
   'Redi':           '000000',
   'Gek Mas':        '000000',

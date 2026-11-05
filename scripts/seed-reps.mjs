@@ -38,6 +38,7 @@ const REPS = [
   { name: 'Taufik 2',       area: 'CANGGU 2' },
   { name: 'Wira',           area: 'GT + FOODY' },
   { name: 'Sriasih',        area: 'MODERN + GT' },
+  { name: 'Rijal',          area: 'MT' },
   { name: 'Ridwan',         area: 'NP-1 (Nestlé)' },
   { name: 'Widi',           area: 'NP-2 (Nestlé)' },
   { name: 'Gek Mas',        area: 'NP-3 (Nestlé)' },
