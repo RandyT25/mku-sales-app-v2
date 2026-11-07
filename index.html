@@ -54,7 +54,7 @@
 
   <header class="topbar">
     <div class="topbar-left">
-      <button class="back-btn" onclick="logout()">
+      <button class="back-btn" onclick="handleTopbarBack()" id="topbar-back-btn" title="Back / Exit">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
       <div class="topbar-identity-wrap" onclick="openProfile()">
@@ -82,8 +82,8 @@
   </header>
 
   <div class="view-as-banner hidden" id="view-as-banner">
-    Viewing as <b id="view-as-name"></b>
-    <button onclick="exitViewAs()">Exit</button>
+    <span>Viewing as <b id="view-as-name"></b></span>
+    <button type="button" class="view-as-exit-btn" onclick="exitViewAs()">Exit View As</button>
   </div>
 
   <div class="screens" id="screens">
@@ -497,8 +497,10 @@
       </button>
       <button class="pm-btn-add" style="flex:1" onclick="submitProfileForm()">Save</button>
     </div>
+    <button class="profile-changepin-btn" id="profile-exit-view-as-btn" onclick="exitViewAsFromProfile()" style="display:none; background:var(--gold,#cca855); color:#121212; border:none; font-weight:700; margin-top:10px;">Exit View As</button>
     <button class="profile-changepin-btn" id="change-pin-btn" onclick="openChangePin()">Change PIN</button>
     <button class="profile-changepin-btn" id="reset-rep-pin-btn" onclick="resetRepPinProfile()" style="display:none; border-color:var(--red); color:var(--red); margin-top:0;">Reset Rep's PIN</button>
+    <button class="profile-changepin-btn profile-logout-btn" id="profile-logout-btn" onclick="logoutFromProfile()" style="border-color:var(--border); color:var(--txt2); margin-top:0;">Log Out</button>
   </div>
 </div>
 

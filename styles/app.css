@@ -754,13 +754,24 @@ input { font-family: var(--sans); }
 
 /* ── VIEW AS BANNER (Super Admin) ── */
 .view-as-banner {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  background: var(--gold); color: #1a1400; font-size: .75rem; font-weight: 700;
-  padding: 7px 12px; text-align: center;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: var(--gold); color: #1a1400; font-size: .8rem; font-weight: 700;
+  padding: 8px 16px; text-align: left; position: relative; z-index: 35;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12); flex-shrink: 0;
 }
-.view-as-banner button {
-  border: none; background: rgba(0,0,0,0.15); color: inherit; font-weight: 700;
-  font-size: .7rem; padding: 3px 10px; border-radius: var(--r-sm);
+.view-as-banner span {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.view-as-banner button,
+.view-as-banner .view-as-exit-btn {
+  border: none; background: #1a1400; color: #fff; font-weight: 700;
+  font-size: .75rem; padding: 7px 14px; min-height: 36px; border-radius: var(--r-sm);
+  cursor: pointer; flex-shrink: 0; transition: transform 0.1s, background 0.15s;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.view-as-banner button:active,
+.view-as-banner .view-as-exit-btn:active {
+  transform: scale(0.95); background: #333;
 }
 
 /* ── INTEL PHOTO ── */
@@ -771,7 +782,12 @@ input { font-family: var(--sans); }
 .profile-changepin-btn {
   width: calc(100% - 40px); margin: 10px 20px 20px; padding: 12px;
   border-radius: var(--r-md); border: 1.5px solid var(--border); background: var(--surface);
-  font-size: .82rem; font-weight: 700; color: var(--txt2);
+  font-size: .82rem; font-weight: 700; color: var(--txt2); cursor: pointer;
+}
+.profile-logout-btn:active {
+  background: var(--red-l, rgba(173,31,40,0.1));
+  color: var(--red);
+  border-color: var(--red);
 }
 #change-pin-modal .login-pin-dots { margin-top: 14px; }
 
