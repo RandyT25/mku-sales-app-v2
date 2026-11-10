@@ -730,9 +730,6 @@ function _showLogin() {
 }
 
 function _dataLoaded() {
-  if (typeof RAW !== 'undefined') {
-    console.log('RAW.latest=', RAW.latest, 'Juni pct=', (RAW.targets_by_date[RAW.latest]?.area_targets||[]).find(a=>a.sales==='Juni')?.pct);
-  }
   clearInterval(_barTimer);
   const b = document.getElementById('load-bar');
   if (b) b.style.width = '100%';
