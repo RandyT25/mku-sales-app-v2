@@ -10,6 +10,15 @@ export async function startAssessment(customerId) {
   return data; // session id
 }
 
+// Active products, used to show a blank assessment before any server draft exists.
+export async function fetchActiveProducts() {
+  const { data, error } = await supabase
+    .from('slow_moving_products').select('id, product_name, packaging, display_order')
+    .eq('active', true).order('display_order');
+  if (error) throw error;
+  return data;
+}
+
 export async function fetchItems(sessionId) {
   const { data, error } = await supabase
     .from('product_assessment_items').select(ITEM_COLS).eq('session_id', sessionId);
@@ -44,4 +53,25 @@ export async function completeAssessment(sessionId) {
   if (error) throw error;
 }
 
-window.SlowMoving = { startAssessment, fetchItems, fetchMyDrafts, saveItem, completeAssessment };
+// Supabase caps a response at 1000 rows; a completed assessment is 8 rows, so
+// the facts view outgrows that after ~125 assessments — page through it.
+async function fetchAll(build) {
+  const out = [];
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await build().range(from, from + 999);
+    if (error) throw error;
+    out.push(...data);
+    if (data.length < 1000) return out;
+  }
+}
+
+// Management dashboard inputs: every completed answer + every session (for completion rates).
+export const fetchFacts = () => fetchAll(() =>
+  supabase.from('slow_moving_item_facts').select('*').order('completed_at', { ascending: false }).order('item_id'));
+export const fetchSessions = () => fetchAll(() =>
+  supabase.from('product_assessment_sessions').select('id, customer_id, rep_id, assessment_status, reps(name)').order('id'));
+
+// PostgREST says PGRST202 (function) / PGRST205 (table) when migration 0017 isn't live.
+export const isNotSetUp = e => ['PGRST202', 'PGRST205', '42P01'].includes(e?.code);
+
+window.SlowMoving = { startAssessment, fetchActiveProducts, fetchItems, fetchMyDrafts, saveItem, completeAssessment, fetchFacts, fetchSessions, isNotSetUp };

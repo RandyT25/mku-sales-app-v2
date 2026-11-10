@@ -28,7 +28,7 @@
     [
       'lib/auth.js', 'lib/dashboard-data.js', 'features/competitor-intel.js',
       'features/customer-identity.js', 'features/customer-relations.js',
-      'features/today-priorities.js', 'features/announcements.js',
+      'features/announcements.js',
       'features/rep-profile.js', 'features/admin-actions.js', 'features/deals.js',
       'features/slow-moving-ui.js',
     ].forEach(function (src) {
@@ -89,15 +89,7 @@
 
   <div class="screens" id="screens">
 
-    <div class="screen active" id="screen-today">
-      <div class="today-header">
-        <div class="today-title">Today's Priorities</div>
-        <div class="today-sub" id="today-date"></div>
-      </div>
-      <div id="today-body"></div>
-    </div>
-
-    <div class="screen" id="screen-target">
+    <div class="screen active" id="screen-target">
       <div class="target-hero" id="target-hero"></div>
       <div class="target-body" id="target-body"></div>
     </div>
@@ -589,11 +581,7 @@
 </div>
 
   <nav class="bottom-nav">
-    <button class="bnav active" id="bnav-today" onclick="switchTab('today')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 15l2 2 4-4"/></svg>
-      <span>Today</span>
-    </button>
-    <button class="bnav" id="bnav-target" onclick="switchTab('target')">
+    <button class="bnav active" id="bnav-target" onclick="switchTab('target')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
       <span>Target</span>
     </button>
@@ -944,16 +932,6 @@ async function _loadAllData() {
     window._customersReady = true;
     if (window._custTabOpen) renderCustomers();
     if (typeof window.refreshCustIfOpen === 'function') window.refreshCustIfOpen();
-    // Today's Priorities (buildTodayPriorities -> getRepCustomerList) needs
-    // CUSTOMERS to be loaded, but it's the default landing screen and can
-    // render before this promise settles — unlike Customers above, nothing
-    // re-ran it once real data arrived, so a rep could get stuck on a wrong
-    // "All caught up!" empty state until they manually left and returned to
-    // the tab. Re-run it here if it's still the active screen.
-    const todayScreen = document.getElementById('screen-today');
-    if (todayScreen && todayScreen.classList.contains('active') && typeof initTodayPriorities === 'function') {
-      initTodayPriorities();
-    }
   }).catch(function() { window._customersReady = false; });
   _loadFJAll();
 }
