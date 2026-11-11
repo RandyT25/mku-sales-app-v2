@@ -35,6 +35,7 @@
       document.write('<script type="module" src="' + src + '?v=' + _cacheBust + '"><' + '/script>');
     });
     document.write('<script src="lib/write-queue.js?v=' + _cacheBust + '"><' + '/script>');
+    document.write('<script src="lib/i18n.js?v=' + _cacheBust + '"><' + '/script>');
   </script>
 </head>
 <body>
@@ -285,10 +286,9 @@
           <input class="pl-search" id="intel-search-inp" type="search" placeholder="Search competitor or product…" oninput="onIntelSearch(this.value)" autocomplete="off">
         </div>
         <div class="intel-view-tabs">
-          <button class="intel-view-tab active" onclick="switchIntelView('recent',this)">Recent</button>
-          <button class="intel-view-tab" onclick="switchIntelView('summary',this)">By Competitor</button>
-          <button class="intel-view-tab" onclick="switchIntelView('deals',this)">Deals</button>
-          <button class="intel-view-tab" onclick="switchIntelView('samples',this)">Samples <span class="order-badge" id="samples-badge" style="display:none;position:static;margin-left:4px"></span></button>
+          <button class="intel-view-tab" data-view="samples" onclick="switchIntelView('samples',this)">Samples <span class="order-badge" id="samples-badge" style="display:none;position:static;margin-left:4px"></span></button>
+          <button class="intel-view-tab active" data-view="recent" onclick="switchIntelView('recent',this)">Competitor</button>
+          <button class="intel-view-tab" data-view="deals" onclick="switchIntelView('deals',this)">Deals</button>
           <button class="intel-view-tab hidden" id="intel-tab-slow" onclick="switchIntelView('slow',this)">Slow-Moving</button>
           <button class="of-draft hidden" id="export-intel-btn" style="width:32px;height:32px;padding:7px" onclick="exportIntelXlsx()" title="Export to Excel"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 19h16"/></svg></button>
         </div>
@@ -499,6 +499,7 @@
     <button class="profile-changepin-btn" id="profile-exit-view-as-btn" onclick="exitViewAsFromProfile()" style="display:none; background:var(--gold,#cca855); color:#121212; border:none; font-weight:700; margin-top:10px;">Exit View As</button>
     <button class="profile-changepin-btn" id="change-pin-btn" onclick="openChangePin()">Change PIN</button>
     <button class="profile-changepin-btn" id="reset-rep-pin-btn" onclick="resetRepPinProfile()" style="display:none; border-color:var(--red); color:var(--red); margin-top:0;">Reset Rep's PIN</button>
+    <button class="profile-changepin-btn" id="lang-toggle-btn" onclick="I18n.toggle()" style="margin-top:0">Bahasa Indonesia</button>
     <button class="profile-changepin-btn profile-logout-btn" id="profile-logout-btn" onclick="logoutFromProfile()" style="border-color:var(--border); color:var(--txt2); margin-top:0;">Log Out</button>
   </div>
 </div>
