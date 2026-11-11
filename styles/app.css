@@ -1483,3 +1483,14 @@ input { font-family: var(--sans); }
 .smd-fb-det { font-size: .72rem; color: var(--txt); margin-top: 4px; }
 .smd-fb-cmt { font-size: .75rem; font-style: italic; color: var(--txt2); margin-top: 4px; }
 .smd-fb-meta { font-size: .65rem; color: var(--txt3); margin-top: 6px; }
+
+/* ── Intel → Samples (features/samples.js) ── */
+.smp-requested { background: var(--gold-l); color: var(--gold); }
+.smp-sent { background: var(--orange-l); color: var(--gold); }
+.smp-feedback { background: var(--green-l); color: var(--green); }
+.smp-done, .smp-cancelled { background: var(--out-l); color: var(--out); }
+.smp-due { display: block; font-size: .66rem; color: var(--txt2); margin-top: 4px; text-align: right; }
+.smp-due.od { color: #C0392B; font-weight: 700; }
+.smp-acts { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 8px; }
+.smp-btn { font: inherit; font-size: .72rem; font-weight: 600; padding: 6px 12px; border-radius: var(--r-pill); border: 1px solid var(--border); background: var(--surface); color: var(--txt); cursor: pointer; }
+.smp-btn.pri { background: var(--green); border-color: var(--green); color: #fff; }
