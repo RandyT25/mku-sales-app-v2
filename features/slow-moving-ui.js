@@ -38,11 +38,16 @@ async function loadDrafts() {
   if (S.view === 'picker') render();
 }
 
+// Full list, no cap — reps must see every customer they own.
+const pickerMatches = q => {
+  const all = typeof getRepCustomerList === 'function' ? getRepCustomerList() : [];
+  return (q ? all.filter(c => (c.name || '').toLowerCase().includes(q)) : all)
+    .slice().sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+};
+
 function pickerHtml() {
   const q = S.q.trim().toLowerCase();
-  const all = typeof getRepCustomerList === 'function' ? getRepCustomerList() : [];
-  const matches = (q ? all.filter(c => (c.name || '').toLowerCase().includes(q)) : all)
-    .slice().sort((a, b) => (a.name || '').localeCompare(b.name || '')).slice(0, 40);
+  const matches = pickerMatches(q);
   const drafts = (S.drafts || []).filter(d => d.product_assessment_items.some(i => i.feedback_status)).map(d => {
     const n = d.product_assessment_items.filter(i => i.feedback_status).length;
     return `<button class="sm-row" onclick="SM.resume('${d.id}')">
@@ -58,6 +63,7 @@ function pickerHtml() {
       ${drafts ? `<div class="sm-sec">In progress</div><div class="sm-list">${drafts}</div>` : ''}
       <div class="sm-sec">Start an assessment</div>
       <input class="pl-search sm-search" id="sm-q" type="search" placeholder="Search customer…" value="${escHtml(S.q)}" oninput="SM.onSearch(this.value)" autocomplete="off">
+      <div class="sm-sub" id="sm-count">${matches.length} customers</div>
       <div class="sm-list" id="sm-customers">${customersHtml(matches, q)}</div>
     </div>`;
 }
@@ -202,10 +208,9 @@ const SM = window.SM = {
     S.q = v;
     // Only the list is re-rendered so the search box keeps focus.
     const q = v.trim().toLowerCase();
-    const all = typeof getRepCustomerList === 'function' ? getRepCustomerList() : [];
-    const m = (q ? all.filter(c => (c.name || '').toLowerCase().includes(q)) : all)
-      .slice().sort((a, b) => (a.name || '').localeCompare(b.name || '')).slice(0, 40);
+    const m = pickerMatches(q);
     const box = $('sm-customers'); if (box) box.innerHTML = customersHtml(m, q);
+    const n = $('sm-count'); if (n) n.textContent = m.length + ' customers';
   },
 
   async start(code, rep) {
