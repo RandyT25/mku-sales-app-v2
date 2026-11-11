@@ -40,7 +40,11 @@ async function loadDrafts() {
 
 // Full list, no cap — reps must see every customer they own.
 const pickerMatches = q => {
-  const all = typeof getRepCustomerList === 'function' ? getRepCustomerList() : [];
+  // One row per customer: the list can hold the same outlet under several reps/codes,
+  // and an assessment belongs to the customer (name + area), not the code.
+  const seen = new Set(), norm = v => String(v || '').trim().replace(/\s+/g, ' ').toUpperCase();
+  const all = (typeof getRepCustomerList === 'function' ? getRepCustomerList() : [])
+    .filter(c => { const k = norm(c.name) + '|' + norm(c.area); return !seen.has(k) && seen.add(k); });
   return (q ? all.filter(c => (c.name || '').toLowerCase().includes(q)) : all)
     .slice().sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 };
