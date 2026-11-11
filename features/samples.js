@@ -9,6 +9,7 @@ const S = { rows: [], facts: [], loaded: false, error: null, scope: null, status
 const $ = id => document.getElementById(id);
 const today = () => isoDate(new Date());
 const isAdmin = () => !!(currentRep?.isManager || currentRep?.isSuperAdmin);
+const seeAll = () => isAdmin() || !!currentRep?.bisdevCategory; // same rule as the rest of Intel
 const canEdit = r => isAdmin() || r.rep_id === currentRep?.repId;
 const SRC = { customer_request: 'Customer asked', rep_initiated: 'Rep sampling', slow_moving: 'Slow-Moving' };
 
@@ -57,14 +58,14 @@ function render() {
     return;
   }
   if (S.error) { host.innerHTML = `<div class="cust-empty">${escHtml(S.error)}</div>`; return; }
-  if (!S.scope) S.scope = isAdmin() ? 'all' : 'mine';
+  if (!seeAll()) S.scope = 'mine'; else if (!S.scope) S.scope = 'all';
   const t = today(), mine = r => r.rep_id === currentRep?.repId;
   const scoped = S.rows.filter(r => S.scope === 'all' || mine(r));
   const list = sortSamples(scoped.filter(r => S.status === 'open' ? OPEN.includes(r.status) : !OPEN.includes(r.status)), t);
   const sugg = unlinkedNeedsSample(S.facts, S.rows).filter(f => f.rep_id === currentRep?.repId); // RLS: a rep can only insert as themselves
   const chip = (k, v, label, cur) => `<button class="intel-view-tab${cur === v ? ' active' : ''}" onclick="Samples.set('${k}','${v}')">${label}</button>`;
   host.innerHTML = `<div class="sm-wrap">
-    <div class="intel-view-tabs sm-mode">${chip('scope', 'mine', 'Mine', S.scope)}${chip('scope', 'all', 'All reps', S.scope)}</div>
+    ${seeAll() ? `<div class="intel-view-tabs sm-mode">${chip('scope', 'mine', 'Mine', S.scope)}${chip('scope', 'all', 'All reps', S.scope)}</div>` : ''}
     <div class="intel-view-tabs sm-mode">${chip('status', 'open', 'Open', S.status)}${chip('status', 'closed', 'Closed', S.status)}</div>
     ${sugg.length && S.status === 'open' ? `<div class="sm-sec">From Slow-Moving — customers who need a sample</div><div class="sm-list">${sugg.map(f =>
       `<div class="sm-row sm-row-static"><span class="sm-row-main"><b>${escHtml(f.product_name)}</b><small>${escHtml(f.customer_name)}${f.sample_requirements ? ' · ' + escHtml(f.sample_requirements) : ''}</small></span>
