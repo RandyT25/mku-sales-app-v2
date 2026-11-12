@@ -113,11 +113,10 @@ function feedbackHtml() {
   const cards = groups.slice(0, D.limit).map(g => {
     const f = g[0], c = idx[f.customer_key];
     const reps = [...new Set(g.map(x => x.rep_name))].join(', ');
-    return `<div class="smd-fb">
-      <div class="smd-fb-top"><button class="smd-link" onclick="SMDash.openCustomer('${escHtml(f.customer_key)}')">${escHtml(f.customer_name)}</button>
-        <span class="smd-count">${g.length} product${g.length === 1 ? '' : 's'}</span></div>
+    return `<details class="smd-fb"><summary class="smd-fb-top"><button class="smd-link" onclick="SMDash.openCustomer('${escHtml(f.customer_key)}')">${escHtml(f.customer_name)}</button>
+        <span class="smd-count">${g.length} product${g.length === 1 ? '' : 's'}</span></summary>
       <div class="smd-fb-meta">${escHtml(reps)} · ${escHtml(f.customer_area || '—')}${c?.group ? ' · ' + escHtml(c.group) : ''} · ${new Date(Math.max(...g.map(x => new Date(x.completed_at)))).toLocaleDateString('id-ID')}</div>
-      ${g.map(item).join('')}</div>`;
+      ${g.map(item).join('')}</details>`;
   }).join('');
   return `<div class="sm-sec" id="smd-feedback">Customer feedback <span class="smd-count">${rows.length}</span></div>
     <input class="pl-search sm-search" id="smd-q" type="search" placeholder="Search customer, rep, product, comment…" value="${escHtml(D.f.q)}" oninput="SMDash.onQ(this.value)" autocomplete="off">
