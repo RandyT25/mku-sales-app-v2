@@ -1477,6 +1477,7 @@ input { font-family: var(--sans); }
 @media (min-width: 720px) { .smd-filters { grid-template-columns: repeat(3, 1fr) auto; align-items: center; } }
 .smd-fb { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md); box-shadow: var(--shadow-card); padding: 10px 12px; margin-bottom: 6px; }
 .smd-fb > summary { cursor: pointer; list-style: none; }
+.smd-fb > summary .smd-count { margin-left: auto; }
 .smd-fb > summary::-webkit-details-marker { display: none; }
 .smd-fb > summary::after { content: '▾'; color: var(--txt3); margin-left: 8px; }
 .smd-fb[open] > summary::after { content: '▴'; }
