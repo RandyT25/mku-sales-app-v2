@@ -98,19 +98,26 @@ function feedbackHtml() {
   const opt = (v, t, sel) => `<option value="${escHtml(v)}"${sel === v ? ' selected' : ''}>${escHtml(t)}</option>`;
   const prods = [...new Map(D.facts.map(f => [f.product_id, f])).values()].sort((a, b) => a.display_order - b.display_order);
   const reps = [...new Map(D.facts.map(f => [f.rep_id, f.rep_name])).entries()].sort((a, b) => a[1].localeCompare(b[1]));
-  const cards = rows.slice(0, D.limit).map(f => {
-    const c = idx[f.customer_key];
+  const groups = [...rows.reduce((m, f) => m.set(f.customer_key, [...(m.get(f.customer_key) || []), f]), new Map()).values()];
+  const item = f => {
     const details = [f.target_price != null && 'Target ' + fmtRp(f.target_price), f.requested_packaging && 'Packaging: ' + f.requested_packaging,
       f.competitor_brand && 'Competitor: ' + f.competitor_brand, f.estimated_monthly_volume != null && 'Volume ' + f.estimated_monthly_volume + '/mo',
       f.target_purchase_date && 'Buy by ' + f.target_purchase_date, f.sample_requirements && 'Sample: ' + f.sample_requirements,
       f.rejection_reason && 'Reason: ' + f.rejection_reason, f.not_applicable_reason && 'N/A: ' + f.not_applicable_reason, f.explanation].filter(Boolean);
+    return `<div class="smd-fb-item">
+      <div class="smd-fb-top"><div class="smd-fb-prod">${escHtml(f.product_name)} · ${escHtml(f.packaging)}${f.followup_required ? ' · <b class="smd-flag">Follow-up</b>' : ''}</div>
+        <span class="sm-chip sm-tone-${tone(f.feedback_status)}">${escHtml(label(f.feedback_status))}</span></div>
+      ${details.length ? `<div class="smd-fb-det">${details.map(escHtml).join(' · ')}</div>` : ''}
+      ${f.customer_comment ? `<div class="smd-fb-cmt">“${escHtml(f.customer_comment)}”</div>` : ''}</div>`;
+  };
+  const cards = groups.slice(0, D.limit).map(g => {
+    const f = g[0], c = idx[f.customer_key];
+    const reps = [...new Set(g.map(x => x.rep_name))].join(', ');
     return `<div class="smd-fb">
       <div class="smd-fb-top"><button class="smd-link" onclick="SMDash.openCustomer('${escHtml(f.customer_key)}')">${escHtml(f.customer_name)}</button>
-        <span class="sm-chip sm-tone-${tone(f.feedback_status)}">${escHtml(label(f.feedback_status))}</span></div>
-      <div class="smd-fb-prod">${escHtml(f.product_name)} · ${escHtml(f.packaging)}${f.followup_required ? ' · <b class="smd-flag">Follow-up</b>' : ''}</div>
-      ${details.length ? `<div class="smd-fb-det">${details.map(escHtml).join(' · ')}</div>` : ''}
-      ${f.customer_comment ? `<div class="smd-fb-cmt">“${escHtml(f.customer_comment)}”</div>` : ''}
-      <div class="smd-fb-meta">${escHtml(f.rep_name)} · ${escHtml(f.customer_area || '—')}${c?.group ? ' · ' + escHtml(c.group) : ''} · ${new Date(f.completed_at).toLocaleDateString('id-ID')}</div></div>`;
+        <span class="smd-count">${g.length} product${g.length === 1 ? '' : 's'}</span></div>
+      <div class="smd-fb-meta">${escHtml(reps)} · ${escHtml(f.customer_area || '—')}${c?.group ? ' · ' + escHtml(c.group) : ''} · ${new Date(Math.max(...g.map(x => new Date(x.completed_at)))).toLocaleDateString('id-ID')}</div>
+      ${g.map(item).join('')}</div>`;
   }).join('');
   return `<div class="sm-sec" id="smd-feedback">Customer feedback <span class="smd-count">${rows.length}</span></div>
     <input class="pl-search sm-search" id="smd-q" type="search" placeholder="Search customer, rep, product, comment…" value="${escHtml(D.f.q)}" oninput="SMDash.onQ(this.value)" autocomplete="off">
@@ -120,7 +127,7 @@ function feedbackHtml() {
       <select class="sm-input" onchange="SMDash.setF('repId',this.value)">${opt('', 'All salespeople', D.f.repId)}${reps.map(([id, n]) => opt(id, n, D.f.repId)).join('')}</select>
       <label class="sm-check"><input type="checkbox" ${D.f.followupOnly ? 'checked' : ''} onchange="SMDash.setF('followupOnly',this.checked)"> Follow-up only</label></div>
     <div id="smd-fb-list">${cards || '<div class="cust-empty">No matching feedback</div>'}</div>
-    ${rows.length > D.limit ? `<button class="sm-secondary" onclick="SMDash.more()">Show more (${rows.length - D.limit} left)</button>` : ''}`;
+    ${groups.length > D.limit ? `<button class="sm-secondary" onclick="SMDash.more()">Show more (${groups.length - D.limit} left)</button>` : ''}`;
 }
 
 function render() {
