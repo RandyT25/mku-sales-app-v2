@@ -114,7 +114,8 @@ function feedbackHtml() {
     const f = g[0], c = idx[f.customer_key];
     const reps = [...new Set(g.map(x => x.rep_name))].join(', ');
     return `<details class="smd-fb"><summary class="smd-fb-top"><button class="smd-link" onclick="SMDash.openCustomer('${escHtml(f.customer_key)}')">${escHtml(f.customer_name)}</button>
-        <span class="smd-count">${g.length} product${g.length === 1 ? '' : 's'}</span></summary>
+        <span class="smd-fb-sum">${[...g.reduce((m, x) => m.set(x.feedback_status, (m.get(x.feedback_status) || 0) + 1), new Map())].map(([st, n]) => `<span class="sm-chip sm-tone-${tone(st)}">${escHtml(label(st))}${n > 1 ? ' ×' + n : ''}</span>`).join('')}
+        <span class="smd-count">${g.length} product${g.length === 1 ? '' : 's'}</span></span></summary>
       <div class="smd-fb-meta">${escHtml(reps)} · ${escHtml(f.customer_area || '—')}${c?.group ? ' · ' + escHtml(c.group) : ''} · ${new Date(Math.max(...g.map(x => new Date(x.completed_at)))).toLocaleDateString('id-ID')}</div>
       ${g.map(item).join('')}</details>`;
   }).join('');
