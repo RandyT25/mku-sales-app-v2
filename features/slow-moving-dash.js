@@ -126,7 +126,8 @@ function feedbackHtml() {
       <select class="sm-input" onchange="SMDash.setF('status',this.value)">${opt('', 'All answers', D.f.status)}${FEEDBACK_OPTIONS.map(o => opt(o.value, o.label, D.f.status)).join('')}</select>
       <select class="sm-input" onchange="SMDash.setF('productId',this.value)">${opt('', 'All products', D.f.productId)}${prods.map(p => opt(p.product_id, p.product_name + ' ' + p.packaging, D.f.productId)).join('')}</select>
       <select class="sm-input" onchange="SMDash.setF('repId',this.value)">${opt('', 'All salespeople', D.f.repId)}${reps.map(([id, n]) => opt(id, n, D.f.repId)).join('')}</select>
-      <label class="sm-check"><input type="checkbox" ${D.f.followupOnly ? 'checked' : ''} onchange="SMDash.setF('followupOnly',this.checked)"> Follow-up only</label></div>
+      <label class="sm-check"><input type="checkbox" ${D.f.followupOnly ? 'checked' : ''} onchange="SMDash.setF('followupOnly',this.checked)"> Follow-up only</label>
+      <button class="sm-secondary" onclick="SMDash.toggleAll(this)">Expand all</button></div>
     <div id="smd-fb-list">${cards || '<div class="cust-empty">No matching feedback</div>'}</div>
     ${groups.length > D.limit ? `<button class="sm-secondary" onclick="SMDash.more()">Show more (${groups.length - D.limit} left)</button>` : ''}`;
 }
@@ -155,6 +156,11 @@ window.SMDash = {
   onQ(v) { D.f.q = v; D.limit = 40; refreshList(); },
   setF(k, v) { D.f[k] = v; D.limit = 40; render(); },
   more() { D.limit += 40; render(); },
+  toggleAll(btn) {
+    const ds = document.querySelectorAll('#smd-fb-list details.smd-fb'), open = btn.textContent === 'Expand all';
+    ds.forEach(d => { d.open = open; });
+    btn.textContent = open ? 'Collapse all' : 'Expand all';
+  },
   pickProduct(id) { D.f.productId = id; D.limit = 40; render(); $('smd-feedback')?.scrollIntoView({ behavior: 'smooth' }); },
   openCustomer(key) {
     const c = customerIndex()[key];
