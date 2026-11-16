@@ -1501,3 +1501,6 @@ input { font-family: var(--sans); }
 .smp-acts { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 8px; }
 .smp-btn { font: inherit; font-size: .72rem; font-weight: 600; padding: 6px 12px; border-radius: var(--r-pill); border: 1px solid var(--border); background: var(--surface); color: var(--txt); cursor: pointer; }
 .smp-btn.pri { background: var(--green); border-color: var(--green); color: #fff; }
+
+/* Slow-Moving dashboard: floating back-to-top */
+.smd-top { position: fixed; right: 16px; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); z-index: 40; width: 42px; height: 42px; border-radius: 50%; border: 0; background: var(--blue); color: #fff; font-size: 1.2rem; font-weight: 700; box-shadow: 0 4px 14px rgba(0,0,0,.25); cursor: pointer; }

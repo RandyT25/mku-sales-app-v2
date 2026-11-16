@@ -4,6 +4,7 @@ import './slow-moving.js';
 import { FEEDBACK_OPTIONS, optionOf } from './slow-moving-logic.js';
 import { computeMetrics, filterFacts, customerKey, STATUSES } from './slow-moving-metrics.js';
 
+const dispName = n => (typeof feedDisplayName === 'function' ? feedDisplayName(n) : n);
 const D = { loaded: false, loading: false, error: null, facts: [], sessions: [], m: null,
   f: { q: '', status: '', productId: '', repId: '', followupOnly: false }, limit: 40 };
 const $ = id => document.getElementById(id);
@@ -81,23 +82,29 @@ const nk = (n, a) => String(n || '').trim().replace(/\s+/g, ' ').toUpperCase() +
 function coverageHtml() {
   const list = typeof getRepCustomerList === 'function' ? getRepCustomerList() : [];
   if (!list.length) return '';
-  const done = new Map(); // customer -> { date, rep, counts }
+  // Same outlet can sit in two salespeople's lists (e.g. Widi/Ridwan and Dewi). An assessment counts
+  // for a salesperson only if THEY filled it; otherwise the row stays "Not yet" with a note.
+  const disp = n => (typeof feedDisplayName === 'function' ? feedDisplayName(n) : n);
+  const done = new Map(); // customer -> Map(rep display -> { date, st })
   for (const f of D.facts) {
-    const k = nk(f.customer_name, f.customer_area), d = done.get(k) || { date: f.completed_at, rep: f.rep_name, st: new Map() };
+    const k = nk(f.customer_name, f.customer_area), r = disp(f.rep_name);
+    if (!done.has(k)) done.set(k, new Map());
+    const m = done.get(k), d = m.get(r) || { date: f.completed_at, rep: f.rep_name, st: new Map() };
     d.st.set(f.feedback_status, (d.st.get(f.feedback_status) || 0) + 1);
-    if (f.completed_at > d.date) { d.date = f.completed_at; d.rep = f.rep_name; }
-    done.set(k, d);
+    if (f.completed_at > d.date) d.date = f.completed_at;
+    m.set(r, d);
   }
   const by = new Map(), seen = new Set();
   for (const c of list) {
-    const k = nk(c.name, c.area), sales = c.sales || '—';
+    const k = nk(c.name, c.area), sales = disp(c.sales || '—');
     if (seen.has(sales + '|' + k)) continue; seen.add(sales + '|' + k);
     if (!by.has(sales)) by.set(sales, []);
-    by.get(sales).push({ c, k, d: done.get(k) });
+    const m = done.get(k), other = m && !m.has(sales) ? [...m.values()][0] : null;
+    by.get(sales).push({ c, k, d: m?.get(sales), other });
   }
-  const row = ({ c, d }) => `<div class="smd-li"><span>${escHtml(c.name)} <small>${escHtml(c.area || '')}</small></span>${d
+  const row = ({ c, d, other }) => `<div class="smd-li"><span><button class="smd-link" onclick="SMDash.openCust('${escHtml(c.code)}','${escHtml(c.sales || '')}')">${escHtml(c.name)}</button> <small>${escHtml(c.area || '')}</small></span>${d
     ? `<span class="smd-fb-sum">${[...d.st].map(([st, n]) => `<span class="sm-chip sm-tone-${tone(st)}">${escHtml(label(st))}${n > 1 ? ' ×' + n : ''}</span>`).join('')}</span><small>${new Date(d.date).toLocaleDateString('id-ID')}${d.rep ? ' · ' + escHtml(d.rep) : ''}</small>`
-    : '<small>Not yet</small>'}</div>`;
+    : `<small>Not yet${other ? ' (assessed by ' + escHtml(other.rep) + ')' : ''}</small>`}</div>`;
   const total = [...by.values()].reduce((n, a) => n + a.length, 0), got = [...by.values()].reduce((n, a) => n + a.filter(x => x.d).length, 0);
   const cards = [...by.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([sales, rows]) => {
     const yes = rows.filter(r => r.d), no = rows.filter(r => !r.d);
@@ -147,7 +154,7 @@ function feedbackHtml() {
   };
   const cards = groups.slice(0, D.limit).map(g => {
     const f = g[0], c = idx[f.customer_key];
-    const reps = [...new Set(g.map(x => x.rep_name))].join(', ');
+    const reps = [...new Set(g.map(x => dispName(x.rep_name)))].join(', ');
     return `<details class="smd-fb"><summary class="smd-fb-top"><button class="smd-link" onclick="SMDash.openCustomer('${escHtml(f.customer_key)}')">${escHtml(f.customer_name)}</button>
         <small class="smd-fb-rep">${escHtml(reps)}</small>
         <span class="smd-fb-sum">${[...g.reduce((m, x) => m.set(x.feedback_status, (m.get(x.feedback_status) || 0) + 1), new Map())].map(([st, n]) => `<span class="sm-chip sm-tone-${tone(st)}">${escHtml(label(st))}${n > 1 ? ' ×' + n : ''}</span>`).join('')}
@@ -182,7 +189,7 @@ function render() {
     return;
   }
   host.innerHTML = `<div class="sm-wrap smd">${top}<div class="sm-title">Slow-Moving Products Intelligence</div>
-    ${overallHtml(D.m.overall)}${coverageHtml()}${productsHtml(D.m.products)}${repsHtml(D.m.salespeople)}${insightsHtml(D.m.insights)}${feedbackHtml()}</div>`;
+    ${overallHtml(D.m.overall)}${coverageHtml()}${productsHtml(D.m.products)}${repsHtml(D.m.salespeople)}${insightsHtml(D.m.insights)}${feedbackHtml()}<button class="smd-top" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button></div>`;
 }
 
 window.SMDash = {
@@ -197,6 +204,7 @@ window.SMDash = {
     btn.textContent = open ? 'Collapse all' : 'Expand all';
   },
   pickProduct(id) { D.f.productId = id; D.limit = 40; render(); $('smd-feedback')?.scrollIntoView({ behavior: 'smooth' }); },
+  openCust(code, sales) { openCustModal(sales, code); },
   openCustomer(key) {
     const c = customerIndex()[key];
     if (!c) { showToast("This customer isn't in your current customer list"); return; }
