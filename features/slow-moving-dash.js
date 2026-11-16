@@ -189,7 +189,7 @@ function render() {
     return;
   }
   host.innerHTML = `<div class="sm-wrap smd">${top}<div class="sm-title">Slow-Moving Products Intelligence</div>
-    ${overallHtml(D.m.overall)}${coverageHtml()}${productsHtml(D.m.products)}${repsHtml(D.m.salespeople)}${insightsHtml(D.m.insights)}${feedbackHtml()}<button class="smd-top" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button></div>`;
+    ${overallHtml(D.m.overall)}${coverageHtml()}${productsHtml(D.m.products)}${repsHtml(D.m.salespeople)}${insightsHtml(D.m.insights)}${feedbackHtml()}<button class="smd-top" aria-label="Back to top" onclick="this.closest('.screen').scrollTo({top:0,behavior:'smooth'})">↑</button></div>`;
 }
 
 window.SMDash = {
