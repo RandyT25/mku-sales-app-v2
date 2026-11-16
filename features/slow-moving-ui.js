@@ -12,7 +12,7 @@ import {
 const S = {
   mode: null,          // 'assess' | 'dash'; null = pick a default on first render (managers → dash)
   view: 'picker',      // 'picker' | 'assess' | 'summary'
-  q: '', drafts: null, loadError: null,
+  q: '', drafts: null, done: null, loadError: null,
   sessionId: null, customer: null, items: [], open: null,
   dirty: {},           // product key -> accumulated patch not yet saved
   timers: {}, saveState: 'saved', busy: false, materializing: null,
@@ -23,7 +23,7 @@ const api = () => window.SlowMoving;
 const NOT_SET_UP = "Slow-Moving Products isn't set up on the server yet (database migration 0017 is not applied).";
 const errText = e => (api().isNotSetUp(e) ? NOT_SET_UP : (e.message || String(e)));
 // Managers and Super Admin get the dashboard alongside the assessment form.
-const canDash = () => !!(typeof currentRep !== 'undefined' && (currentRep?.isManager || currentRep?.isSuperAdmin));
+const canDash = () => !!(typeof currentRep !== 'undefined' && (currentRep?.isManager || currentRep?.isSuperAdmin || currentRep?.bisdevCategory === 'food'));
 function modeToggleHtml() {
   if (!canDash()) return '';
   if (!S.mode) S.mode = 'dash';
@@ -33,12 +33,18 @@ function modeToggleHtml() {
 
 // ── picker ───────────────────────────────────────────────────────────────
 async function loadDrafts() {
-  try { S.drafts = await api().fetchMyDrafts(); S.loadError = null; }
-  catch (e) { console.error('fetchMyDrafts', e); S.loadError = errText(e); S.drafts = []; }
+  try { [S.drafts, S.done] = await Promise.all([api().fetchMyDrafts(), api().fetchMyCompleted()]); S.loadError = null; }
+  catch (e) { console.error('fetchMyDrafts', e); S.loadError = errText(e); S.drafts = []; S.done = []; }
   if (S.view === 'picker') render();
 }
 
 // Full list, no cap — reps must see every customer they own.
+const normKey = (n, a) => String(n || '').trim().replace(/\s+/g, ' ').toUpperCase() + '|' + String(a || '').trim().replace(/\s+/g, ' ').toUpperCase();
+// customer key -> newest completed session of this rep (S.done is newest-first)
+const doneMap = () => { const m = new Map(); for (const d of S.done || []) { const k = normKey(d.customers?.name, d.customers?.area); if (!m.has(k)) m.set(k, d); } return m; };
+const fmtDate = iso => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+const ANSWER_KEYS = ['feedback_status', 'customer_comment', ...Object.keys(FIELD_DEFS)];
+const pickAnswers = it => Object.fromEntries(ANSWER_KEYS.map(k => [k, it[k] ?? (FIELD_DEFS[k]?.type === 'bool' ? false : null)]));
 const pickerMatches = q => {
   // One row per customer: the list can hold the same outlet under several reps/codes,
   // and an assessment belongs to the customer (name + area), not the code.
@@ -65,18 +71,22 @@ function pickerHtml() {
       <div class="sm-sub">Evaluate customer interest and identify commercial opportunities across our selected slow-moving products.</div>
       ${S.loadError ? `<div class="intel-form-error">Couldn't load your drafts: ${escHtml(S.loadError)}</div>` : ''}
       ${drafts ? `<div class="sm-sec">In progress</div><div class="sm-list">${drafts}</div>` : ''}
-      <div class="sm-sec">Start an assessment</div>
+      <div class="sm-sec">Customers</div>
       <input class="pl-search sm-search" id="sm-q" type="search" placeholder="Search customer…" value="${escHtml(S.q)}" oninput="SM.onSearch(this.value)" autocomplete="off">
       <div class="sm-sub" id="sm-count">${matches.length} customers</div>
-      <div class="sm-list" id="sm-customers">${customersHtml(matches, q)}</div>
+      <div id="sm-customers">${customersHtml(matches, q)}</div>
     </div>`;
 }
 
 function customersHtml(matches, q) {
   if (!matches.length) return `<div class="cust-empty">${q ? 'No matching customers' : 'No customers loaded'}</div>`;
-  return matches.map(c => `<button class="sm-row" onclick="SM.start('${escHtml(c.code)}','${escHtml(c.sales || '')}')">
+  const done = doneMap(), todo = [], updated = [];
+  matches.forEach(c => (done.has(normKey(c.name, c.area)) ? updated : todo).push(c));
+  const row = (c, d) => `<button class="sm-row" onclick="SM.start('${escHtml(c.code)}','${escHtml(c.sales || '')}')">
       <span class="sm-row-main"><b>${escHtml(c.name)}</b><small>${escHtml(c.area || '')}${c.group ? ' · ' + escHtml(c.group) : ''}</small></span>
-      <span class="sm-go">›</span></button>`).join('');
+      ${d ? `<span class="sm-chip sm-tone-good">✓ ${fmtDate(d.completed_at)} · Update</span>` : `<span class="sm-go">›</span>`}</button>`;
+  return (todo.length ? `<div class="sm-sec">Not yet assessed (${todo.length})</div><div class="sm-list">${todo.map(c => row(c)).join('')}</div>` : '')
+    + (updated.length ? `<div class="sm-sec">Already assessed — tap to update (${updated.length})</div><div class="sm-list">${updated.map(c => row(c, done.get(normKey(c.name, c.area)))).join('')}</div>` : '');
 }
 
 // ── assessment ───────────────────────────────────────────────────────────
@@ -173,6 +183,10 @@ async function materialize() {
         // adopt answers already stored in a pre-existing draft, unless edited here
         if (!it.feedback_status && !S.dirty[it.key] && s.feedback_status) Object.assign(it, s, { key: it.key });
         it.id = s.id;
+        if (it.prefilled) { // update of an earlier assessment: carry the old answers into the new draft
+          it.prefilled = false;
+          if (!S.dirty[it.key]) { S.dirty[it.key] = pickAnswers(it); S.timers[it.key] = setTimeout(() => saveOne(it.key), 700); }
+        }
       }
       S.sessionId = sid;
     })().finally(() => { S.materializing = null; });
@@ -227,7 +241,7 @@ const SM = window.SM = {
       const existing = (S.drafts || []).find(d => d.customers?.name === c.name && (d.customers?.area || '') === (c.area || '')
         && d.product_assessment_items.some(i => i.feedback_status));
       if (existing) return await enter(existing.id, { name: c.name, area: c.area });
-      await startFresh({ name: c.name, area: c.area });
+      await startFresh({ name: c.name, area: c.area }, doneMap().get(normKey(c.name, c.area)));
     } catch (e) { console.error('start assessment', e); showToast("Couldn't start — " + errText(e), 5000); }
   },
 
@@ -307,9 +321,11 @@ function open_(items, sessionId, customer) {
 async function enter(sessionId, customer) {
   open_((await api().fetchItems(sessionId)).map(i => ({ ...i, key: i.product_id })), sessionId, customer);
 }
-async function startFresh(customer) {
+async function startFresh(customer, prev) {
   const prods = await api().fetchActiveProducts();
   if (!prods.length) throw new Error('No slow-moving products are configured');
+  const old = new Map((prev?.product_assessment_items || []).map(i => [i.product_id, i]));
   open_(prods.map(p => ({ id: null, key: p.id, product_id: p.id, feedback_status: null, customer_comment: null, followup_required: false,
+    ...(old.has(p.id) ? { ...pickAnswers(old.get(p.id)), prefilled: true } : {}),
     slow_moving_products: { product_name: p.product_name, packaging: p.packaging, display_order: p.display_order } })), null, customer);
 }

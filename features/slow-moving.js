@@ -40,6 +40,32 @@ export async function fetchMyDrafts() {
   return data;
 }
 
+// The caller's completed assessments (latest per customer first) with their answers,
+// so already-filled customers keep their data and can be updated.
+export async function fetchMyCompleted() {
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data: me, error: meErr } = await supabase.from('reps').select('id').eq('auth_user_id', user.id).single();
+  if (meErr) throw meErr;
+  const { data, error } = await supabase
+    .from('product_assessment_sessions')
+    .select(`id, completed_at, customers(name, area), product_assessment_items(${ITEM_COLS})`)
+    .eq('rep_id', me.id).eq('assessment_status', 'completed')
+    .order('completed_at', { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
+// An update is a new completed session, so the dashboard keeps only the newest
+// completed session per customer (otherwise an update would count twice).
+function latestPerCustomer(sessions) {
+  const best = new Map();
+  for (const s of sessions) if (s.assessment_status === 'completed' || s.completed_at) {
+    const b = best.get(s.customer_id);
+    if (!b || s.completed_at > b.completed_at) best.set(s.customer_id, s);
+  }
+  return new Set([...best.values()].map(s => s.id));
+}
+
 export async function saveItem(id, patch) {
   const { error, count } = await supabase
     .from('product_assessment_items').update(patch, { count: 'exact' }).eq('id', id);
@@ -66,12 +92,21 @@ async function fetchAll(build) {
 }
 
 // Management dashboard inputs: every completed answer + every session (for completion rates).
-export const fetchFacts = () => fetchAll(() =>
-  supabase.from('slow_moving_item_facts').select('*').order('completed_at', { ascending: false }).order('item_id'));
-export const fetchSessions = () => fetchAll(() =>
-  supabase.from('product_assessment_sessions').select('id, customer_id, rep_id, assessment_status, reps(name)').order('id'));
+// Superseded completed sessions (a customer updated later) are dropped from both.
+export async function fetchFacts() {
+  const facts = await fetchAll(() =>
+    supabase.from('slow_moving_item_facts').select('*').order('completed_at', { ascending: false }).order('item_id'));
+  const keep = latestPerCustomer(facts.map(f => ({ id: f.session_id, customer_id: f.customer_id, completed_at: f.completed_at })));
+  return facts.filter(f => keep.has(f.session_id));
+}
+export async function fetchSessions() {
+  const rows = await fetchAll(() =>
+    supabase.from('product_assessment_sessions').select('id, customer_id, rep_id, assessment_status, completed_at, reps(name)').order('id'));
+  const keep = latestPerCustomer(rows);
+  return rows.filter(r => r.assessment_status !== 'completed' || keep.has(r.id));
+}
 
 // PostgREST says PGRST202 (function) / PGRST205 (table) when migration 0017 isn't live.
 export const isNotSetUp = e => ['PGRST202', 'PGRST205', '42P01'].includes(e?.code);
 
-window.SlowMoving = { startAssessment, fetchActiveProducts, fetchItems, fetchMyDrafts, saveItem, completeAssessment, fetchFacts, fetchSessions, isNotSetUp };
+window.SlowMoving = { startAssessment, fetchActiveProducts, fetchItems, fetchMyDrafts, fetchMyCompleted, saveItem, completeAssessment, fetchFacts, fetchSessions, isNotSetUp };
