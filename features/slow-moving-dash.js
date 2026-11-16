@@ -102,7 +102,7 @@ function coverageHtml() {
     const m = done.get(k), other = m && !m.has(sales) ? [...m.values()][0] : null;
     by.get(sales).push({ c, k, d: m?.get(sales), other });
   }
-  const row = ({ c, d, other }) => `<div class="smd-li"><span><button class="smd-link" onclick="SMDash.openCust('${escHtml(c.code)}','${escHtml(c.sales || '')}')">${escHtml(c.name)}</button> <small>${escHtml(c.area || '')}</small></span>${d
+  const row = ({ c, d, other }) => `<div class="smd-li"><span>${d ? `<button class="smd-link" onclick="SMDash.toFeedback('${escHtml(c.name).replace(/'/g, "\\'")}')">${escHtml(c.name)}</button>` : escHtml(c.name)} <small>${escHtml(c.area || '')}</small></span>${d
     ? `<span class="smd-fb-sum">${[...d.st].map(([st, n]) => `<span class="sm-chip sm-tone-${tone(st)}">${escHtml(label(st))}${n > 1 ? ' ×' + n : ''}</span>`).join('')}</span><small>${new Date(d.date).toLocaleDateString('id-ID')}${d.rep ? ' · ' + escHtml(d.rep) : ''}</small>`
     : `<small>Not yet${other ? ' (assessed by ' + escHtml(other.rep) + ')' : ''}</small>`}</div>`;
   const total = [...by.values()].reduce((n, a) => n + a.length, 0), got = [...by.values()].reduce((n, a) => n + a.filter(x => x.d).length, 0);
@@ -204,7 +204,12 @@ window.SMDash = {
     btn.textContent = open ? 'Collapse all' : 'Expand all';
   },
   pickProduct(id) { D.f.productId = id; D.limit = 40; render(); $('smd-feedback')?.scrollIntoView({ behavior: 'smooth' }); },
-  openCust(code, sales) { openCustModal(sales, code); },
+  // Coverage row (assessed only) -> the Customer feedback list, filtered to that customer, card opened.
+  toFeedback(name) {
+    D.f = { q: name, status: '', productId: '', repId: '', followupOnly: false }; D.limit = 40; render();
+    const sec = $('smd-feedback'); sec?.scrollIntoView({ behavior: 'smooth' });
+    const first = document.querySelector('#smd-fb-list details.smd-fb'); if (first) first.open = true;
+  },
   openCustomer(key) {
     const c = customerIndex()[key];
     if (!c) { showToast("This customer isn't in your current customer list"); return; }
