@@ -76,6 +76,41 @@ function repsHtml(reps) {
     <div class="smd-note">Completion = completed ÷ started. Detail = share of actionable answers with a comment or detail filled — measures information quality, not positivity.</div>`;
 }
 
+// Cross-check: every customer in the company list vs. completed assessments, grouped by salesperson.
+const nk = (n, a) => String(n || '').trim().replace(/\s+/g, ' ').toUpperCase() + '|' + String(a || '').trim().replace(/\s+/g, ' ').toUpperCase();
+function coverageHtml() {
+  const list = typeof getRepCustomerList === 'function' ? getRepCustomerList() : [];
+  if (!list.length) return '';
+  const done = new Map(); // customer -> { date, rep, counts }
+  for (const f of D.facts) {
+    const k = nk(f.customer_name, f.customer_area), d = done.get(k) || { date: f.completed_at, rep: f.rep_name, st: new Map() };
+    d.st.set(f.feedback_status, (d.st.get(f.feedback_status) || 0) + 1);
+    if (f.completed_at > d.date) { d.date = f.completed_at; d.rep = f.rep_name; }
+    done.set(k, d);
+  }
+  const by = new Map(), seen = new Set();
+  for (const c of list) {
+    const k = nk(c.name, c.area), sales = c.sales || '—';
+    if (seen.has(sales + '|' + k)) continue; seen.add(sales + '|' + k);
+    if (!by.has(sales)) by.set(sales, []);
+    by.get(sales).push({ c, k, d: done.get(k) });
+  }
+  const row = ({ c, d }) => `<div class="smd-li"><span>${escHtml(c.name)} <small>${escHtml(c.area || '')}</small></span>${d
+    ? `<span class="smd-fb-sum">${[...d.st].map(([st, n]) => `<span class="sm-chip sm-tone-${tone(st)}">${escHtml(label(st))}${n > 1 ? ' ×' + n : ''}</span>`).join('')}</span><small>${new Date(d.date).toLocaleDateString('id-ID')}${d.rep ? ' · ' + escHtml(d.rep) : ''}</small>`
+    : '<small>Not yet</small>'}</div>`;
+  const total = [...by.values()].reduce((n, a) => n + a.length, 0), got = [...by.values()].reduce((n, a) => n + a.filter(x => x.d).length, 0);
+  const cards = [...by.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([sales, rows]) => {
+    const yes = rows.filter(r => r.d), no = rows.filter(r => !r.d);
+    return `<details class="smd-fb"><summary class="smd-fb-top"><b>${escHtml(sales)}</b>
+      <span class="smd-fb-sum"><span class="sm-chip sm-tone-good">${yes.length} assessed</span><span class="sm-chip sm-tone-warn">${no.length} not yet</span></span>
+      <span class="smd-count">${fmtPct(Math.round(yes.length / rows.length * 100))}</span></summary>
+      ${no.length ? `<div class="sm-sec">Not yet assessed (${no.length})</div>${no.map(row).join('')}` : ''}
+      ${yes.length ? `<div class="sm-sec">Assessed (${yes.length})</div>${yes.map(row).join('')}` : ''}</details>`;
+  }).join('');
+  return `<div class="sm-sec">Coverage by salesperson <span class="smd-count">${got}/${total} customers assessed</span></div>${cards}
+    <div class="smd-note">Customers are matched by name + area against completed assessments from any salesperson.</div>`;
+}
+
 function listHtml(title, rows, fmt) {
   return `<div class="smd-ins"><h4>${title}</h4>${rows.length ? rows.map(fmt).join('') : '<small class="smd-empty">No data yet</small>'}</div>`;
 }
@@ -143,11 +178,11 @@ function render() {
   if (D.error) { host.innerHTML = `<div class="sm-wrap">${top}<div class="intel-form-error">${escHtml(D.error)}</div><button class="sm-secondary" onclick="SMDash.reload()">Retry</button></div>`; return; }
   if (!D.facts.length) {
     host.innerHTML = `<div class="sm-wrap">${top}<div class="sm-title">Slow-Moving Products Intelligence</div>
-      <div class="cust-empty">No completed assessments yet. Results appear here as salespeople submit them.</div></div>`;
+      <div class="cust-empty">No completed assessments yet. Results appear here as salespeople submit them.</div>${coverageHtml()}</div>`;
     return;
   }
   host.innerHTML = `<div class="sm-wrap smd">${top}<div class="sm-title">Slow-Moving Products Intelligence</div>
-    ${overallHtml(D.m.overall)}${productsHtml(D.m.products)}${repsHtml(D.m.salespeople)}${insightsHtml(D.m.insights)}${feedbackHtml()}</div>`;
+    ${overallHtml(D.m.overall)}${coverageHtml()}${productsHtml(D.m.products)}${repsHtml(D.m.salespeople)}${insightsHtml(D.m.insights)}${feedbackHtml()}</div>`;
 }
 
 window.SMDash = {
