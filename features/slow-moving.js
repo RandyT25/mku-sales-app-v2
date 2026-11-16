@@ -40,19 +40,15 @@ export async function fetchMyDrafts() {
   return data;
 }
 
-// The caller's completed assessments (latest per customer first) with their answers,
-// so already-filled customers keep their data and can be updated.
+// Completed assessments for ALL reps (newest first), with their answers. Matching is by
+// customer, not by login: the same customer is "assessed" whoever filled it in (and
+// whichever account is viewing, e.g. Super Admin viewing as a rep), exactly like the dashboard.
 export async function fetchMyCompleted() {
-  const { data: { user } } = await supabase.auth.getUser();
-  const { data: me, error: meErr } = await supabase.from('reps').select('id').eq('auth_user_id', user.id).single();
-  if (meErr) throw meErr;
-  const { data, error } = await supabase
+  return fetchAll(() => supabase
     .from('product_assessment_sessions')
     .select(`id, completed_at, customers(name, area), product_assessment_items(${ITEM_COLS})`)
-    .eq('rep_id', me.id).eq('assessment_status', 'completed')
-    .order('completed_at', { ascending: false });
-  if (error) throw error;
-  return data;
+    .eq('assessment_status', 'completed')
+    .order('completed_at', { ascending: false }).order('id'));
 }
 
 // An update is a new completed session, so the dashboard keeps only the newest
